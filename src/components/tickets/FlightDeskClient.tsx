@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import type { Flight } from "@/lib/types";
 import { popularAirports } from "@/data/flights";
-import { destinations } from "@/data/destinations";
 import { flightSearchSchema } from "@/lib/validators";
 import { formatUsd, cn, BLUR_DATA_URL } from "@/lib/utils";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
@@ -92,26 +91,6 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
       },
     [toCity]
   );
-
-  const destinationVisual = useMemo(() => {
-    const matched = destinations.find(
-      (d) => d.name.toLowerCase() === toCity.toLowerCase()
-    );
-    if (matched) {
-      return {
-        image: matched.image,
-        title: `${matched.name}, ${matched.country}`,
-        tagline: matched.tagline,
-        flightHours: matched.duration,
-      };
-    }
-    return {
-      image: "/images/services/flight-window.jpg",
-      title: `${fromCity} → ${toCity}`,
-      tagline: "Verified international schedules with checked baggage included.",
-      flightHours: "Direct & 1-stop",
-    };
-  }, [fromCity, toCity]);
 
   const results = useMemo(() => {
     const exact = initialFlights.filter(
@@ -259,59 +238,58 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
   };
 
   return (
-    <div className="space-y-5">
-      {/* Top Editorial Bento Showcase: 8-Col Hero + Search & 4-Col Destination Spotlight */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-        {/* Left 8 Cols: Flight Desk Hero with Embedded Search Bar (overflow-visible so BarSelect dropdown never clips) */}
-        <div className="lg:col-span-8 relative min-h-[440px] rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
-          {/* Clipped background photo container */}
-          <div className="absolute inset-0 z-0 rounded-[24px] overflow-hidden pointer-events-none">
-            <Image
-              src="/images/services/flight-window.jpg"
-              alt="View above the clouds from an aircraft cabin window"
-              fill
-              priority
-              sizes="(min-width: 1024px) 66vw, 96vw"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
-              className="object-cover object-center"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/38 to-black/25"
-            />
-          </div>
+    <div className="space-y-6">
+      {/* Expansive Panoramic Horizon Hero Stage (Full-span, spacious, non-boxed) */}
+      <div className="relative min-h-[480px] rounded-[28px] border border-line bg-ink text-white p-6 sm:p-8 lg:p-10 flex flex-col justify-between gap-8">
+        {/* Clipped background photo container */}
+        <div className="absolute inset-0 z-0 rounded-[28px] overflow-hidden pointer-events-none">
+          <Image
+            src="/images/services/flight-window.jpg"
+            alt="View above the clouds from an aircraft cabin window"
+            fill
+            priority
+            sizes="96vw"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+            className="object-cover object-center"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/35"
+          />
+        </div>
 
-          {/* Top Service Desk Switcher + Trip Type Toggle */}
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
-            <nav
-              aria-label="Switch travel service desk"
-              className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 p-1"
-            >
-              {SERVICE_TABS.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <Link
-                    key={tab.href}
-                    href={tab.href}
-                    aria-current={tab.active ? "page" : undefined}
-                    className={
-                      tab.active
-                        ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
-                        : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
-                    }
-                  >
-                    <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
-                    {tab.label}
-                  </Link>
-                );
-              })}
-            </nav>
+        {/* Top Header: Desk Switcher + Trip Type Toggle + Status Badge */}
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
+          <nav
+            aria-label="Switch travel service desk"
+            className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 p-1"
+          >
+            {SERVICE_TABS.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  aria-current={tab.active ? "page" : undefined}
+                  className={
+                    tab.active
+                      ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
+                      : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
+                  }
+                >
+                  <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
+                  {tab.label}
+                </Link>
+              );
+            })}
+          </nav>
 
+          <div className="flex flex-wrap items-center gap-2.5">
             <div
               role="radiogroup"
               aria-label="Trip type"
-              className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur-md border border-white/25 p-1"
+              className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 p-1"
             >
               {(["round-trip", "one-way"] as const).map((mode) => (
                 <button
@@ -321,7 +299,7 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
                   aria-checked={tripType === mode}
                   onClick={() => setTripType(mode)}
                   className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer",
+                    "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer",
                     tripType === mode
                       ? "bg-white text-ink shadow-xs"
                       : "text-white/85 hover:text-white"
@@ -331,59 +309,70 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
                 </button>
               ))}
             </div>
+
+            <span className="hidden sm:inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-1.5 text-xs font-medium text-white">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              Live Carrier Inventory
+            </span>
           </div>
+        </div>
 
-          {/* Bottom Headline + Embedded Flight Search Bar */}
-          <div className="relative z-10 space-y-5 mt-auto">
-            <div className="max-w-xl space-y-2">
-              <h1 className="text-[clamp(2rem,3.8vw,3.25rem)] font-medium tracking-[-0.03em] leading-[1.05] text-white">
-                Direct &amp; one-stop flights.
-              </h1>
-              <p className="text-sm sm:text-[15px] text-white/85 leading-relaxed">
-                Compare verified schedules across premier carriers with transparent baggage allowances and no surprise fees.
-              </p>
-            </div>
+        {/* Center Editorial Headline + Live Route Pill Barometer */}
+        <div className="relative z-10 max-w-3xl space-y-3.5 my-auto">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white/95">
+            <span>Direct &amp; 1-stop routes</span>
+            <span className="h-1 w-1 rounded-full bg-white/60" />
+            <span className="font-mono text-white/85">Baggage included</span>
+          </div>
+          <h1 className="text-[clamp(2.25rem,4.5vw,3.75rem)] font-medium tracking-[-0.03em] leading-[1.08] text-white">
+            Direct &amp; one-stop flights worldwide.
+          </h1>
+          <p className="text-sm sm:text-base text-white/85 leading-relaxed max-w-2xl">
+            Compare verified schedules across premier international carriers with checked baggage allowances, transparent seat classes, and zero surprise fees.
+          </p>
 
-            <SearchBarShell floating className="text-ink">
-              <form
-                onSubmit={onSearchSubmit}
-                noValidate
-                className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
-              >
-                <div className="md:col-span-3 flex items-center">
-                  <div className="flex-1 min-w-0">
-                    <BarSelect
-                      id="tickets-from"
-                      label="From"
-                      value={fromCity}
-                      onChange={(e) => setFromCity(e.target.value)}
-                    >
-                      {popularAirports.map((a) => (
-                        <option key={a.code} value={a.city} className="bg-surface text-ink">
-                          {a.city} ({a.code})
-                        </option>
-                      ))}
-                    </BarSelect>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFromCity(toCity);
-                      setToCity(fromCity);
-                    }}
-                    aria-label="Swap origin and destination"
-                    className="mr-2 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-bg text-ink-muted hover:text-ink hover:border-ink transition-colors cursor-pointer"
-                  >
-                    <ArrowLeftRight className="h-3.5 w-3.5" strokeWidth={1.6} aria-hidden="true" />
-                  </button>
-                </div>
+          {/* Quick Route Tickers */}
+          <div className="pt-2 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-white/70 mr-1">Quick routes:</span>
+            {POPULAR_ROUTES.map((route) => {
+              const isActive = fromCity === route.from && toCity === route.to;
+              return (
+                <button
+                  key={route.code}
+                  type="button"
+                  onClick={() => {
+                    setFromCity(route.from);
+                    setToCity(route.to);
+                  }}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer backdrop-blur-md border",
+                    isActive
+                      ? "bg-white text-ink border-white font-semibold shadow-xs"
+                      : "bg-black/35 text-white/90 border-white/20 hover:bg-white/20 hover:text-white"
+                  )}
+                >
+                  {route.code}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-                <div className="md:col-span-3">
+        {/* Full-Width Docked Search Bar (Spanning full container!) */}
+        <div className="relative z-20">
+          <SearchBarShell floating className="text-ink shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
+            <form
+              onSubmit={onSearchSubmit}
+              noValidate
+              className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
+            >
+              <div className="md:col-span-3 flex items-center">
+                <div className="flex-1 min-w-0">
                   <BarSelect
-                    id="tickets-to"
-                    label="To"
-                    value={toCity}
-                    onChange={(e) => setToCity(e.target.value)}
+                    id="tickets-from"
+                    label="From"
+                    value={fromCity}
+                    onChange={(e) => setFromCity(e.target.value)}
                   >
                     {popularAirports.map((a) => (
                       <option key={a.code} value={a.city} className="bg-surface text-ink">
@@ -392,106 +381,75 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
                     ))}
                   </BarSelect>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFromCity(toCity);
+                    setToCity(fromCity);
+                  }}
+                  aria-label="Swap origin and destination"
+                  className="mr-2 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-bg text-ink-muted hover:text-ink hover:border-ink transition-colors cursor-pointer"
+                >
+                  <ArrowLeftRight className="h-3.5 w-3.5" strokeWidth={1.6} aria-hidden="true" />
+                </button>
+              </div>
 
+              <div className="md:col-span-3">
+                <BarSelect
+                  id="tickets-to"
+                  label="To"
+                  value={toCity}
+                  onChange={(e) => setToCity(e.target.value)}
+                >
+                  {popularAirports.map((a) => (
+                    <option key={a.code} value={a.city} className="bg-surface text-ink">
+                      {a.city} ({a.code})
+                    </option>
+                  ))}
+                </BarSelect>
+              </div>
+
+              <div className="md:col-span-2">
+                <BarDate
+                  id="tickets-depart"
+                  label="Depart"
+                  value={departDate}
+                  onChange={(e) => setDepartDate(e.target.value)}
+                />
+              </div>
+
+              {tripType === "round-trip" ? (
                 <div className="md:col-span-2">
                   <BarDate
-                    id="tickets-depart"
-                    label="Depart"
-                    value={departDate}
-                    onChange={(e) => setDepartDate(e.target.value)}
+                    id="tickets-return"
+                    label="Return"
+                    value={returnDate}
+                    onChange={(e) => setReturnDate(e.target.value)}
                   />
                 </div>
-
-                {tripType === "round-trip" ? (
-                  <div className="md:col-span-2">
-                    <BarDate
-                      id="tickets-return"
-                      label="Return"
-                      value={returnDate}
-                      onChange={(e) => setReturnDate(e.target.value)}
-                    />
-                  </div>
-                ) : (
-                  <div className="md:col-span-2">
-                    <BarInput
-                      id="tickets-pax"
-                      label="Passengers"
-                      type="number"
-                      min={1}
-                      max={9}
-                      value={passengers}
-                      onChange={(e) =>
-                        setPassengers(Math.max(1, Number(e.target.value) || 1))
-                      }
-                    />
-                  </div>
-                )}
-
-                <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
-                  <BarSubmitButton className="w-full justify-between">
-                    Search
-                  </BarSubmitButton>
+              ) : (
+                <div className="md:col-span-2">
+                  <BarInput
+                    id="tickets-pax"
+                    label="Passengers"
+                    type="number"
+                    min={1}
+                    max={9}
+                    value={passengers}
+                    onChange={(e) =>
+                      setPassengers(Math.max(1, Number(e.target.value) || 1))
+                    }
+                  />
                 </div>
-              </form>
-            </SearchBarShell>
-          </div>
-        </div>
+              )}
 
-        {/* Right 4 Cols: Live Boarding Telemetry Bento Card */}
-        <div className="lg:col-span-4 relative min-h-[340px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 flex flex-col justify-between group">
-          <Image
-            src={destinationVisual.image}
-            alt={destinationVisual.title}
-            fill
-            sizes="(min-width: 1024px) 32vw, 96vw"
-            placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/25"
-          />
-
-          <div className="relative z-10 flex items-center justify-between gap-2">
-            <span className="rounded-full bg-white/18 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
-              Route Telemetry
-            </span>
-            <span className="rounded-full bg-black/55 backdrop-blur-md border border-white/20 px-2.5 py-1 font-mono text-xs font-medium text-white">
-              {fromAirport.code} ⇄ {toAirport.code}
-            </span>
-          </div>
-
-          <div className="relative z-10 rounded-[18px] bg-white/14 backdrop-blur-md border border-white/25 p-4 space-y-3">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="font-mono text-xs text-white/70">DEPART</p>
-                <p className="font-mono text-2xl font-semibold text-white">{fromAirport.code}</p>
-                <p className="text-xs text-white/80 truncate max-w-[90px]">{fromAirport.city}</p>
+              <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
+                <BarSubmitButton className="w-full justify-between">
+                  Search Flights
+                </BarSubmitButton>
               </div>
-
-              <div className="flex-1 flex flex-col items-center">
-                <span className="font-mono text-[11px] text-white/80">{destinationVisual.flightHours}</span>
-                <div className="my-1 flex w-full items-center">
-                  <div className="h-px flex-1 border-t border-dashed border-white/40" />
-                  <Plane className="mx-1.5 h-3.5 w-3.5 text-white shrink-0" strokeWidth={1.8} />
-                  <div className="h-px flex-1 border-t border-dashed border-white/40" />
-                </div>
-                <span className="text-[10.5px] text-emerald-300 font-medium">Baggage included</span>
-              </div>
-
-              <div className="text-right">
-                <p className="font-mono text-xs text-white/70">ARRIVE</p>
-                <p className="font-mono text-2xl font-semibold text-white">{toAirport.code}</p>
-                <p className="text-xs text-white/80 truncate max-w-[90px]">{toAirport.city}</p>
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-white/20 flex items-center justify-between text-xs text-white/85">
-              <span>{tripType === "round-trip" ? "Round-trip route" : "One-way route"}</span>
-              <span className="font-mono font-medium text-white">{results.length} departures</span>
-            </div>
-          </div>
+            </form>
+          </SearchBarShell>
         </div>
       </div>
 
@@ -501,41 +459,26 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
         </p>
       ) : null}
 
-      {/* Single Clean Filter & Quick Routes Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 rounded-[22px] border border-line bg-surface p-3.5 sm:px-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-ink-muted mr-1">
-            Popular routes:
+      {/* Results Header: Route Summary & Clean Filter Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs uppercase tracking-wider text-ink-muted">
+            Available Flights
           </span>
-          {POPULAR_ROUTES.map((route) => {
-            const isActiveRoute =
-              fromCity === route.from && toCity === route.to;
-            return (
-              <button
-                key={route.code}
-                type="button"
-                onClick={() => {
-                  setFromCity(route.from);
-                  setToCity(route.to);
-                }}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs font-medium transition-colors cursor-pointer",
-                  isActiveRoute
-                    ? "bg-ink text-bg border-ink"
-                    : "bg-bg/70 text-ink hover:border-ink/40 border-line"
-                )}
-              >
-                {route.code}
-              </button>
-            );
-          })}
+          <span className="h-1 w-1 rounded-full bg-ink-muted" />
+          <span className="text-xs font-medium text-ink">
+            {fromAirport.city} ({fromAirport.code}) → {toAirport.city} ({toAirport.code})
+          </span>
+          <span className="rounded-full bg-surface border border-line px-2 py-0.5 font-mono text-[11px] text-ink-muted">
+            {results.length} found
+          </span>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2 border-t lg:border-t-0 pt-2.5 lg:pt-0 border-line">
+        <div className="flex flex-wrap items-center gap-2">
           <div
             role="group"
             aria-label="Filter by cabin class"
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1"
           >
             {(["All", "Economy", "Business"] as const).map((cab) => (
               <FilterChip
@@ -549,12 +492,12 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
             ))}
           </div>
 
-          <div className="hidden sm:block h-6 w-px bg-line" aria-hidden="true" />
+          <div className="hidden sm:block h-4 w-px bg-line" aria-hidden="true" />
 
           <div
             role="group"
             aria-label="Sort flights"
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1"
           >
             <FilterChip
               active={sortBy === "price"}

@@ -12,7 +12,6 @@ import {
   Building2,
   CarFront,
   Check,
-  ArrowUpRight,
 } from "lucide-react";
 import type { Hotel } from "@/lib/types";
 import { hotelSearchSchema } from "@/lib/validators";
@@ -73,13 +72,6 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
     if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return 5;
     return Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)));
   }, [checkIn, checkOut]);
-
-  const spotlightHotel = useMemo(
-    () =>
-      initialHotels.find((h) => h.id === "caldera-suites-santorini") ??
-      initialHotels[0],
-    [initialHotels]
-  );
 
   const filteredHotels = useMemo(() => {
     return initialHotels.filter((hotel) => {
@@ -160,190 +152,160 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
     cityFilter !== "All" || maxPrice < 1000 || starFilter !== "All";
 
   return (
-    <div className="space-y-5">
-      {/* Top Editorial Bento Showcase: 8-Col Hero + Search & 4-Col Featured Sanctuary Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-        {/* Left 8 Cols: Main Sanctuary Hero with Embedded Search Bar (overflow-visible so BarSelect dropdown never clips) */}
-        <div className="lg:col-span-8 relative min-h-[440px] rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
-          {/* Clipped background photo container */}
-          <div className="absolute inset-0 z-0 rounded-[24px] overflow-hidden pointer-events-none">
-            <Image
-              src="/images/services/hotel-sanctuary.jpg"
-              alt="Sunlit luxury resort suite terrace overlooking the sea"
-              fill
-              priority
-              sizes="(min-width: 1024px) 66vw, 96vw"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
-              className="object-cover object-center"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25"
-            />
+    <div className="space-y-6">
+      {/* Expansive Panoramic Hotel Horizon Hero Stage (Full-span, spacious, non-boxed) */}
+      <div className="relative min-h-[480px] rounded-[28px] border border-line bg-ink text-white p-6 sm:p-8 lg:p-10 flex flex-col justify-between gap-8">
+        {/* Clipped background photo container */}
+        <div className="absolute inset-0 z-0 rounded-[28px] overflow-hidden pointer-events-none">
+          <Image
+            src="/images/services/hotel-sanctuary.jpg"
+            alt="Sunlit luxury resort suite terrace overlooking the sea"
+            fill
+            priority
+            sizes="96vw"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+            className="object-cover object-center"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/35"
+          />
+        </div>
+
+        {/* Top Header: Desk Switcher + Status Badge */}
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
+          <nav
+            aria-label="Switch travel service desk"
+            className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 p-1"
+          >
+            {SERVICE_TABS.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  aria-current={tab.active ? "page" : undefined}
+                  className={
+                    tab.active
+                      ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
+                      : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
+                  }
+                >
+                  <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
+                  {tab.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-1.5 text-xs font-medium text-white">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            3★ to 5★ Handpicked Stays · Breakfast Included
+          </span>
+        </div>
+
+        {/* Center Editorial Headline + Quick Destination Pills */}
+        <div className="relative z-10 max-w-3xl space-y-3.5 my-auto">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white/95">
+            <span>Verified boutique sanctuaries</span>
+            <span className="h-1 w-1 rounded-full bg-white/60" />
+            <span className="font-mono text-white/85">Best rate guaranteed</span>
           </div>
+          <h1 className="text-[clamp(2.25rem,4.5vw,3.75rem)] font-medium tracking-[-0.03em] leading-[1.08] text-white">
+            Places worth staying for.
+          </h1>
+          <p className="text-sm sm:text-base text-white/85 leading-relaxed max-w-2xl">
+            Cliffside villas, historic ryokans, and architectural sanctuaries—with daily breakfast, verified guest reviews, and clear nightly rates.
+          </p>
 
-          {/* Top Service Desk Switcher */}
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
-            <nav
-              aria-label="Switch travel service desk"
-              className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 p-1"
-            >
-              {SERVICE_TABS.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <Link
-                    key={tab.href}
-                    href={tab.href}
-                    aria-current={tab.active ? "page" : undefined}
-                    className={
-                      tab.active
-                        ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
-                        : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
-                    }
-                  >
-                    <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
-                    {tab.label}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <span className="rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
-              3★ to 5★ Handpicked Stays
-            </span>
-          </div>
-
-          {/* Bottom Headline + Embedded Search Bar */}
-          <div className="relative z-10 space-y-5 mt-auto">
-            <div className="max-w-xl space-y-2">
-              <h1 className="text-[clamp(2rem,3.8vw,3.25rem)] font-medium tracking-[-0.03em] leading-[1.05] text-white">
-                Places worth staying for.
-              </h1>
-              <p className="text-sm sm:text-[15px] text-white/85 leading-relaxed">
-                Cliffside villas, historic ryokans, and architectural sanctuaries—with daily breakfast and transparent nightly rates.
-              </p>
-            </div>
-
-            <SearchBarShell floating className="text-ink">
-              <form
-                onSubmit={handleDateSearch}
-                noValidate
-                className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
-              >
-                <div className="md:col-span-4">
-                  <BarSelect
-                    id="hotel-city-select"
-                    label="Destination"
-                    value={cityFilter}
-                    onChange={(e) => setCityFilter(e.target.value)}
-                  >
-                    {cities.map((c) => (
-                      <option key={c} value={c} className="bg-surface text-ink">
-                        {c === "All" ? "All cities" : c}
-                      </option>
-                    ))}
-                  </BarSelect>
-                </div>
-
-                <div className="md:col-span-3">
-                  <BarDate
-                    id="hotel-checkin"
-                    label="Check-in"
-                    value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <BarDate
-                    id="hotel-checkout"
-                    label="Check-out"
-                    value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                  />
-                </div>
-
-                <div className="md:col-span-1">
-                  <BarInput
-                    id="hotel-guests"
-                    label="Guests"
-                    type="number"
-                    min={1}
-                    max={12}
-                    value={guests}
-                    onChange={(e) =>
-                      setGuests(Math.max(1, Number(e.target.value) || 1))
-                    }
-                  />
-                </div>
-
-                <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
-                  <BarSubmitButton className="w-full justify-between">
-                    Search
-                  </BarSubmitButton>
-                </div>
-              </form>
-            </SearchBarShell>
+          {/* Quick Destination Pills */}
+          <div className="pt-2 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-white/70 mr-1">Popular stays:</span>
+            {["Santorini", "Kyoto", "Amalfi", "Bali", "Swiss Alps", "Reykjavik"].map((city) => {
+              const isActive = cityFilter === city;
+              return (
+                <button
+                  key={city}
+                  type="button"
+                  onClick={() => setCityFilter(city)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer backdrop-blur-md border",
+                    isActive
+                      ? "bg-white text-ink border-white font-semibold shadow-xs"
+                      : "bg-black/35 text-white/90 border-white/20 hover:bg-white/20 hover:text-white"
+                  )}
+                >
+                  {city}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Right 4 Cols: Featured Sanctuary Spotlight Bento Card */}
-        {spotlightHotel ? (
-          <div className="lg:col-span-4 relative min-h-[340px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 flex flex-col justify-between group">
-            <Image
-              src={spotlightHotel.image}
-              alt={spotlightHotel.name}
-              fill
-              sizes="(min-width: 1024px) 32vw, 96vw"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/25"
-            />
-
-            <div className="relative z-10 flex items-center justify-between gap-2">
-              <span className="rounded-full bg-white/18 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
-                Featured Sanctuary
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-black/55 backdrop-blur-md border border-white/20 px-2.5 py-1 font-mono text-xs font-medium text-white">
-                <Star className="h-3 w-3 fill-current" aria-hidden="true" />
-                {spotlightHotel.stars}★ · {spotlightHotel.rating.toFixed(1)}
-              </span>
-            </div>
-
-            <div className="relative z-10 rounded-[18px] bg-white/14 backdrop-blur-md border border-white/25 p-4 space-y-3">
-              <div>
-                <p className="text-xs text-white/80">
-                  {spotlightHotel.city} · {spotlightHotel.neighborhood}
-                </p>
-                <h2 className="text-xl font-medium tracking-[-0.02em] text-white mt-0.5">
-                  {spotlightHotel.name}
-                </h2>
-              </div>
-
-              <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/20">
-                <div>
-                  <span className="font-mono text-lg font-medium text-white">
-                    {formatUsd(spotlightHotel.pricePerNight)}
-                  </span>
-                  <span className="text-xs text-white/75"> / night</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleBookHotel(spotlightHotel)}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink hover:opacity-90 transition-opacity cursor-pointer"
+        {/* Full-Width Docked Search Bar (Spanning full container!) */}
+        <div className="relative z-20">
+          <SearchBarShell floating className="text-ink shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
+            <form
+              onSubmit={handleDateSearch}
+              noValidate
+              className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
+            >
+              <div className="md:col-span-4">
+                <BarSelect
+                  id="hotel-city-select"
+                  label="Destination"
+                  value={cityFilter}
+                  onChange={(e) => setCityFilter(e.target.value)}
                 >
-                  <span>Book suite</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.8} />
-                </button>
+                  {cities.map((c) => (
+                    <option key={c} value={c} className="bg-surface text-ink">
+                      {c === "All" ? "All cities" : c}
+                    </option>
+                  ))}
+                </BarSelect>
               </div>
-            </div>
-          </div>
-        ) : null}
+
+              <div className="md:col-span-3">
+                <BarDate
+                  id="hotel-checkin"
+                  label="Check-in"
+                  value={checkIn}
+                  onChange={(e) => setCheckIn(e.target.value)}
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <BarDate
+                  id="hotel-checkout"
+                  label="Check-out"
+                  value={checkOut}
+                  onChange={(e) => setCheckOut(e.target.value)}
+                />
+              </div>
+
+              <div className="md:col-span-1">
+                <BarInput
+                  id="hotel-guests"
+                  label="Guests"
+                  type="number"
+                  min={1}
+                  max={12}
+                  value={guests}
+                  onChange={(e) =>
+                    setGuests(Math.max(1, Number(e.target.value) || 1))
+                  }
+                />
+              </div>
+
+              <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
+                <BarSubmitButton className="w-full justify-between">
+                  Search Stays
+                </BarSubmitButton>
+              </div>
+            </form>
+          </SearchBarShell>
+        </div>
       </div>
 
       {dateError ? (

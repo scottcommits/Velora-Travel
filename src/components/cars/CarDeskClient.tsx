@@ -13,12 +13,11 @@ import {
   Building2,
   CarFront,
   Check,
-  ArrowUpRight,
 } from "lucide-react";
 import type { Car, CarCategory } from "@/lib/types";
 import { carCategories } from "@/data/cars";
 import { popularAirports } from "@/data/flights";
-import { formatUsd, BLUR_DATA_URL } from "@/lib/utils";
+import { formatUsd, BLUR_DATA_URL, cn } from "@/lib/utils";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
 import { Button } from "@/components/ui/Button";
 import {
@@ -59,13 +58,6 @@ export function CarDeskClient({ initialCars }: { initialCars: Car[] }) {
   const [pickupDate, setPickupDate] = useState("2026-11-21");
   const [rentalDays, setRentalDays] = useState(4);
   const [reservedCarId, setReservedCarId] = useState<string | null>(null);
-
-  const spotlightCar = useMemo(
-    () =>
-      initialCars.find((c) => c.image.includes("porsche-911")) ??
-      initialCars[0],
-    [initialCars]
-  );
 
   const filteredCars = useMemo(() => {
     return initialCars.filter((car) => {
@@ -130,203 +122,174 @@ export function CarDeskClient({ initialCars }: { initialCars: Car[] }) {
     selectedCategory !== "All" || transmissionFilter !== "All";
 
   return (
-    <div className="space-y-5">
-      {/* Top Showroom Bento Showcase: 8-Col Hero + Search & 4-Col Flagship Tourer Spotlight */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-        {/* Left 8 Cols: Grand Touring Hero with Embedded Search Bar (overflow-visible so BarSelect dropdown never clips) */}
-        <div className="lg:col-span-8 relative min-h-[440px] rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
-          {/* Clipped background photo container */}
-          <div className="absolute inset-0 z-0 rounded-[24px] overflow-hidden pointer-events-none">
-            <Image
-              src="/images/services/car-touring.jpg"
-              alt="Grand touring car driving along a scenic coastal highway"
-              fill
-              priority
-              sizes="(min-width: 1024px) 66vw, 96vw"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
-              className="object-cover object-center"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25"
-            />
+    <div className="space-y-6">
+      {/* Expansive Panoramic Fleet Horizon Hero Stage (Full-span, spacious, non-boxed) */}
+      <div className="relative min-h-[480px] rounded-[28px] border border-line bg-ink text-white p-6 sm:p-8 lg:p-10 flex flex-col justify-between gap-8">
+        {/* Clipped background photo container */}
+        <div className="absolute inset-0 z-0 rounded-[28px] overflow-hidden pointer-events-none">
+          <Image
+            src="/images/services/car-touring.jpg"
+            alt="Grand touring car driving along a scenic coastal highway"
+            fill
+            priority
+            sizes="96vw"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+            className="object-cover object-center"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/35"
+          />
+        </div>
+
+        {/* Top Header: Desk Switcher + Status Badge */}
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
+          <nav
+            aria-label="Switch travel service desk"
+            className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 p-1"
+          >
+            {SERVICE_TABS.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  aria-current={tab.active ? "page" : undefined}
+                  className={
+                    tab.active
+                      ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
+                      : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
+                  }
+                >
+                  <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
+                  {tab.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-1.5 text-xs font-medium text-white">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            Airport Handover · Comprehensive Coverage
+          </span>
+        </div>
+
+        {/* Center Editorial Headline + Quick Fleet Category Pills */}
+        <div className="relative z-10 max-w-3xl space-y-3.5 my-auto">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white/95">
+            <span>Pre-inspected showroom fleet</span>
+            <span className="h-1 w-1 rounded-full bg-white/60" />
+            <span className="font-mono text-white/85">Zero hidden counter fees</span>
           </div>
+          <h1 className="text-[clamp(2.25rem,4.5vw,3.75rem)] font-medium tracking-[-0.03em] leading-[1.08] text-white">
+            Drive at your own pace.
+          </h1>
+          <p className="text-sm sm:text-base text-white/85 leading-relaxed max-w-2xl">
+            Airport-ready city hybrids, all-terrain executive SUVs, and flagship grand tourers—delivered clean, inspected, and ready at terminal arrival.
+          </p>
 
-          {/* Top Service Desk Switcher */}
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
-            <nav
-              aria-label="Switch travel service desk"
-              className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 p-1"
-            >
-              {SERVICE_TABS.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <Link
-                    key={tab.href}
-                    href={tab.href}
-                    aria-current={tab.active ? "page" : undefined}
-                    className={
-                      tab.active
-                        ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
-                        : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
-                    }
-                  >
-                    <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
-                    {tab.label}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <span className="rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
-              Airport Handover · Insurance Included
-            </span>
-          </div>
-
-          {/* Bottom Headline + Embedded Fleet Search Bar */}
-          <div className="relative z-10 space-y-5 mt-auto">
-            <div className="max-w-xl space-y-2">
-              <h1 className="text-[clamp(2rem,3.8vw,3.25rem)] font-medium tracking-[-0.03em] leading-[1.05] text-white">
-                Drive at your own pace.
-              </h1>
-              <p className="text-sm sm:text-[15px] text-white/85 leading-relaxed">
-                Airport-ready city hybrids, all-terrain SUVs, and flagship grand tourers—with full coverage and zero hidden counter fees.
-              </p>
-            </div>
-
-            <SearchBarShell floating className="text-ink">
-              <form
-                onSubmit={handleSearch}
-                noValidate
-                className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
-              >
-                <div className="md:col-span-4">
-                  <BarSelect
-                    id="car-pickup-city"
-                    label="Pick-up hub"
-                    value={pickupCity}
-                    onChange={(e) => setPickupCity(e.target.value)}
-                  >
-                    {popularAirports.map((a) => (
-                      <option key={a.code} value={a.city} className="bg-surface text-ink">
-                        {a.city} ({a.code})
-                      </option>
-                    ))}
-                  </BarSelect>
-                </div>
-
-                <div className="md:col-span-3">
-                  <BarDate
-                    id="car-pickup-date"
-                    label="Pick-up date"
-                    value={pickupDate}
-                    onChange={(e) => setPickupDate(e.target.value)}
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <BarSelect
-                    id="car-trans-select"
-                    label="Transmission"
-                    value={transmissionFilter}
-                    onChange={(e) =>
-                      setTransmissionFilter(
-                        e.target.value as "All" | "Automatic" | "Manual"
-                      )
-                    }
-                  >
-                    <option value="All" className="bg-surface text-ink">
-                      All gearboxes
-                    </option>
-                    <option value="Automatic" className="bg-surface text-ink">
-                      Automatic
-                    </option>
-                    <option value="Manual" className="bg-surface text-ink">
-                      Manual
-                    </option>
-                  </BarSelect>
-                </div>
-
-                <div className="md:col-span-1">
-                  <BarInput
-                    id="car-days-input"
-                    label="Days"
-                    type="number"
-                    min={1}
-                    max={30}
-                    value={rentalDays}
-                    onChange={(e) =>
-                      setRentalDays(Math.max(1, Number(e.target.value) || 1))
-                    }
-                  />
-                </div>
-
-                <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
-                  <BarSubmitButton className="w-full justify-between">
-                    Search
-                  </BarSubmitButton>
-                </div>
-              </form>
-            </SearchBarShell>
+          {/* Quick Fleet Category Pills */}
+          <div className="pt-2 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-white/70 mr-1">Fleet category:</span>
+            {carCategories.map((cat) => {
+              const isActive = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer backdrop-blur-md border",
+                    isActive
+                      ? "bg-white text-ink border-white font-semibold shadow-xs"
+                      : "bg-black/35 text-white/90 border-white/20 hover:bg-white/20 hover:text-white"
+                  )}
+                >
+                  {cat === "All" ? "All Fleet" : cat}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Right 4 Cols: Flagship Grand Tourer Spotlight Bento Card */}
-        {spotlightCar ? (
-          <div className="lg:col-span-4 relative min-h-[340px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 flex flex-col justify-between group">
-            <Image
-              src={spotlightCar.image}
-              alt={spotlightCar.name}
-              fill
-              sizes="(min-width: 1024px) 32vw, 96vw"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/25"
-            />
-
-            <div className="relative z-10 flex items-center justify-between gap-2">
-              <span className="rounded-full bg-white/18 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
-                Showroom Spotlight
-              </span>
-              <span className="rounded-full bg-black/55 backdrop-blur-md border border-white/20 px-2.5 py-1 font-mono text-xs font-medium text-white">
-                {spotlightCar.category} · {spotlightCar.transmission}
-              </span>
-            </div>
-
-            <div className="relative z-10 rounded-[18px] bg-white/14 backdrop-blur-md border border-white/25 p-4 space-y-3">
-              <div>
-                <p className="text-xs text-white/80">
-                  {spotlightCar.brand} · {spotlightCar.seats} Seats · {spotlightCar.luggage} Bags
-                </p>
-                <h2 className="text-xl font-medium tracking-[-0.02em] text-white mt-0.5">
-                  {spotlightCar.name}
-                </h2>
-              </div>
-
-              <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/20">
-                <div>
-                  <span className="font-mono text-lg font-medium text-white">
-                    {formatUsd(spotlightCar.pricePerDay)}
-                  </span>
-                  <span className="text-xs text-white/75"> / day</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleReserve(spotlightCar)}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink hover:opacity-90 transition-opacity cursor-pointer"
+        {/* Full-Width Docked Search Bar (Spanning full container!) */}
+        <div className="relative z-20">
+          <SearchBarShell floating className="text-ink shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
+            <form
+              onSubmit={handleSearch}
+              noValidate
+              className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
+            >
+              <div className="md:col-span-4">
+                <BarSelect
+                  id="car-pickup-city"
+                  label="Pick-up hub"
+                  value={pickupCity}
+                  onChange={(e) => setPickupCity(e.target.value)}
                 >
-                  <span>Reserve</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.8} />
-                </button>
+                  {popularAirports.map((a) => (
+                    <option key={a.code} value={a.city} className="bg-surface text-ink">
+                      {a.city} ({a.code})
+                    </option>
+                  ))}
+                </BarSelect>
               </div>
-            </div>
-          </div>
-        ) : null}
+
+              <div className="md:col-span-3">
+                <BarDate
+                  id="car-pickup-date"
+                  label="Pick-up date"
+                  value={pickupDate}
+                  onChange={(e) => setPickupDate(e.target.value)}
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <BarSelect
+                  id="car-trans-select"
+                  label="Transmission"
+                  value={transmissionFilter}
+                  onChange={(e) =>
+                    setTransmissionFilter(
+                      e.target.value as "All" | "Automatic" | "Manual"
+                    )
+                  }
+                >
+                  <option value="All" className="bg-surface text-ink">
+                    All gearboxes
+                  </option>
+                  <option value="Automatic" className="bg-surface text-ink">
+                    Automatic
+                  </option>
+                  <option value="Manual" className="bg-surface text-ink">
+                    Manual
+                  </option>
+                </BarSelect>
+              </div>
+
+              <div className="md:col-span-1">
+                <BarInput
+                  id="car-days-input"
+                  label="Days"
+                  type="number"
+                  min={1}
+                  max={30}
+                  value={rentalDays}
+                  onChange={(e) =>
+                    setRentalDays(Math.max(1, Number(e.target.value) || 1))
+                  }
+                />
+              </div>
+
+              <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
+                <BarSubmitButton className="w-full justify-between">
+                  Search Cars
+                </BarSubmitButton>
+              </div>
+            </form>
+          </SearchBarShell>
+        </div>
       </div>
 
       {/* Single Clean Vehicle Category & Gearbox Filter Strip */}

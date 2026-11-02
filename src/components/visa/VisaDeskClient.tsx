@@ -13,7 +13,6 @@ import {
   Plane,
   Building2,
   CarFront,
-  ArrowUpRight,
 } from "lucide-react";
 import type { VisaOffer, VisaType } from "@/lib/types";
 import { visaCountries, visaTypesList } from "@/data/visas";
@@ -71,12 +70,6 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
       notes: "",
     },
   });
-
-  const spotlightVisa = useMemo(
-    () =>
-      offers.find((o) => o.id === "schengen-tourist") ?? offers[0],
-    [offers]
-  );
 
   const filteredOffers = useMemo(() => {
     return offers.filter((offer) => {
@@ -181,191 +174,168 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
     searchQuery.trim() !== "";
 
   return (
-    <div className="space-y-5">
-      {/* Top Editorial Bento Showcase: 8-Col Hero + Search & 4-Col Featured Visa Permit Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-        {/* Left 8 Cols: Consular Desk Hero with Embedded Search Bar (overflow-visible so BarSelect dropdown never clips) */}
-        <div className="lg:col-span-8 relative min-h-[440px] rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
-          {/* Clipped background photo container */}
-          <div className="absolute inset-0 z-0 rounded-[24px] overflow-hidden pointer-events-none">
-            <Image
-              src="/images/services/visa-passport.jpg"
-              alt="Passport and travel documents on a consular desk"
-              fill
-              priority
-              sizes="(min-width: 1024px) 66vw, 96vw"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
-              className="object-cover object-center"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/38 to-black/25"
-            />
+    <div className="space-y-6">
+      {/* Expansive Panoramic Consular Horizon Hero Stage (Full-span, spacious, non-boxed) */}
+      <div className="relative min-h-[480px] rounded-[28px] border border-line bg-ink text-white p-6 sm:p-8 lg:p-10 flex flex-col justify-between gap-8">
+        {/* Clipped background photo container */}
+        <div className="absolute inset-0 z-0 rounded-[28px] overflow-hidden pointer-events-none">
+          <Image
+            src="/images/services/visa-passport.jpg"
+            alt="Passport and travel documents on a consular desk"
+            fill
+            priority
+            sizes="96vw"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+            className="object-cover object-center"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/35"
+          />
+        </div>
+
+        {/* Top Header: Desk Switcher + Status Badge */}
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
+          <nav
+            aria-label="Switch travel service desk"
+            className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 p-1"
+          >
+            {SERVICE_TABS.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  aria-current={tab.active ? "page" : undefined}
+                  className={
+                    tab.active
+                      ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
+                      : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
+                  }
+                >
+                  <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
+                  {tab.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-1.5 text-xs font-medium text-white">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            Consular Gateway · 99.4% Approval Rate
+          </span>
+        </div>
+
+        {/* Center Editorial Headline + Quick Trending Permit Pills */}
+        <div className="relative z-10 max-w-3xl space-y-3.5 my-auto">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white/95">
+            <span>Pre-screened consular checklists</span>
+            <span className="h-1 w-1 rounded-full bg-white/60" />
+            <span className="font-mono text-white/85">72hr Average processing</span>
           </div>
+          <h1 className="text-[clamp(2.25rem,4.5vw,3.75rem)] font-medium tracking-[-0.03em] leading-[1.08] text-white">
+            Visas without the guesswork.
+          </h1>
+          <p className="text-sm sm:text-base text-white/85 leading-relaxed max-w-2xl">
+            Check verified processing times, stay validity, and entry requirements for 60+ countries—then start your pre-checked application in minutes.
+          </p>
 
-          {/* Top Service Desk Switcher */}
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
-            <nav
-              aria-label="Switch travel service desk"
-              className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 p-1"
-            >
-              {SERVICE_TABS.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <Link
-                    key={tab.href}
-                    href={tab.href}
-                    aria-current={tab.active ? "page" : undefined}
-                    className={
-                      tab.active
-                        ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
-                        : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
-                    }
-                  >
-                    <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
-                    {tab.label}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <span className="rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
-              e-Visa &amp; Consular Desk
-            </span>
-          </div>
-
-          {/* Bottom Headline + Embedded Visa Search Bar */}
-          <div className="relative z-10 space-y-5 mt-auto">
-            <div className="max-w-xl space-y-2">
-              <h1 className="text-[clamp(2rem,3.8vw,3.25rem)] font-medium tracking-[-0.03em] leading-[1.05] text-white">
-                Visas without the guesswork.
-              </h1>
-              <p className="text-sm sm:text-[15px] text-white/85 leading-relaxed">
-                Check exact processing times, stay validity, and entry rules—then start your pre-checked visa application in minutes.
-              </p>
-            </div>
-
-            <SearchBarShell floating className="text-ink">
-              <form
-                onSubmit={handleSearchSubmit}
-                noValidate
-                className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
-              >
-                <div className="md:col-span-4">
-                  <BarSelect
-                    id="visa-country-filter"
-                    label="Destination country"
-                    value={selectedCountry}
-                    onChange={(e) =>
-                      triggerFilterChange(() => setSelectedCountry(e.target.value))
-                    }
-                  >
-                    <option value="All" className="bg-surface text-ink">
-                      All countries ({visaCountries.length})
-                    </option>
-                    {visaCountries.map((country) => (
-                      <option key={country} value={country} className="bg-surface text-ink">
-                        {country}
-                      </option>
-                    ))}
-                  </BarSelect>
-                </div>
-
-                <div className="md:col-span-3">
-                  <BarSelect
-                    id="visa-type-select"
-                    label="Category"
-                    value={selectedType}
-                    onChange={(e) =>
-                      triggerFilterChange(() => setSelectedType(e.target.value))
-                    }
-                  >
-                    {visaTypesList.map((type) => (
-                      <option key={type} value={type} className="bg-surface text-ink">
-                        {type === "All" ? "All types" : `${type} Visa`}
-                      </option>
-                    ))}
-                  </BarSelect>
-                </div>
-
-                <div className="md:col-span-3">
-                  <BarInput
-                    id="visa-search-input"
-                    label="Search country or region"
-                    type="search"
-                    withSearchIcon
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Japan, Europe, AE..."
-                  />
-                </div>
-
-                <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
-                  <BarSubmitButton className="w-full justify-between">
-                    Search
-                  </BarSubmitButton>
-                </div>
-              </form>
-            </SearchBarShell>
+          {/* Quick Trending Permit Pills */}
+          <div className="pt-2 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-white/70 mr-1">Trending permits:</span>
+            {["Schengen Area", "Japan", "United States", "Turkey", "United Kingdom", "United Arab Emirates"].map((country) => {
+              const isActive = selectedCountry === country;
+              return (
+                <button
+                  key={country}
+                  type="button"
+                  onClick={() =>
+                    triggerFilterChange(() => {
+                      setSelectedCountry(country);
+                      setSelectedType("All");
+                      setSearchQuery("");
+                    })
+                  }
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer backdrop-blur-md border",
+                    isActive
+                      ? "bg-white text-ink border-white font-semibold shadow-xs"
+                      : "bg-black/35 text-white/90 border-white/20 hover:bg-white/20 hover:text-white"
+                  )}
+                >
+                  {country}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Right 4 Cols: Featured Schengen Permit Bento Card */}
-        {spotlightVisa ? (
-          <div className="lg:col-span-4 relative min-h-[340px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 flex flex-col justify-between group">
-            <Image
-              src={spotlightVisa.image}
-              alt={spotlightVisa.country}
-              fill
-              sizes="(min-width: 1024px) 32vw, 96vw"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/25"
-            />
-
-            <div className="relative z-10 flex items-center justify-between gap-2">
-              <span className="rounded-full bg-white/18 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
-                Most Requested Permit
-              </span>
-              <span className="rounded-full bg-black/55 backdrop-blur-md border border-white/20 px-2.5 py-1 font-mono text-xs font-medium text-white">
-                {spotlightVisa.flag} · {spotlightVisa.entry} Entry
-              </span>
-            </div>
-
-            <div className="relative z-10 rounded-[18px] bg-white/14 backdrop-blur-md border border-white/25 p-4 space-y-3">
-              <div>
-                <p className="text-xs text-white/80">
-                  {spotlightVisa.processingDays} · {spotlightVisa.validity}
-                </p>
-                <h2 className="text-xl font-medium tracking-[-0.02em] text-white mt-0.5">
-                  {spotlightVisa.country} ({spotlightVisa.visaType})
-                </h2>
-              </div>
-
-              <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/20">
-                <div>
-                  <span className="font-mono text-lg font-medium text-white">
-                    {formatUsd(spotlightVisa.priceUsd)}
-                  </span>
-                  <span className="text-xs text-white/75"> / person</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveVisa(spotlightVisa)}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink hover:opacity-90 transition-opacity cursor-pointer"
+        {/* Full-Width Docked Search Bar (Spanning full container!) */}
+        <div className="relative z-20">
+          <SearchBarShell floating className="text-ink shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
+            <form
+              onSubmit={handleSearchSubmit}
+              noValidate
+              className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
+            >
+              <div className="md:col-span-4">
+                <BarSelect
+                  id="visa-country-filter"
+                  label="Destination country"
+                  value={selectedCountry}
+                  onChange={(e) =>
+                    triggerFilterChange(() => setSelectedCountry(e.target.value))
+                  }
                 >
-                  <span>Apply now</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.8} />
-                </button>
+                  <option value="All" className="bg-surface text-ink">
+                    All countries ({visaCountries.length})
+                  </option>
+                  {visaCountries.map((country) => (
+                    <option key={country} value={country} className="bg-surface text-ink">
+                      {country}
+                    </option>
+                  ))}
+                </BarSelect>
               </div>
-            </div>
-          </div>
-        ) : null}
+
+              <div className="md:col-span-3">
+                <BarSelect
+                  id="visa-type-select"
+                  label="Category"
+                  value={selectedType}
+                  onChange={(e) =>
+                    triggerFilterChange(() => setSelectedType(e.target.value))
+                  }
+                >
+                  {visaTypesList.map((type) => (
+                    <option key={type} value={type} className="bg-surface text-ink">
+                      {type === "All" ? "All categories" : `${type} Visa`}
+                    </option>
+                  ))}
+                </BarSelect>
+              </div>
+
+              <div className="md:col-span-3">
+                <BarInput
+                  id="visa-search-input"
+                  label="Search country or region"
+                  type="search"
+                  withSearchIcon
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Japan, Europe, AE..."
+                />
+              </div>
+
+              <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
+                <BarSubmitButton className="w-full justify-between">
+                  Search Visas
+                </BarSubmitButton>
+              </div>
+            </form>
+          </SearchBarShell>
+        </div>
       </div>
 
       {/* Sleek Single Filter Strip: Country Quick Pills + Permit Categories */}
