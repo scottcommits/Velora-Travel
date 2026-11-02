@@ -121,20 +121,18 @@ export function Navbar() {
             </ul>
           </div>
 
-          {/* Right Actions: Desktop has ThemeToggle + Plan a trip; Mobile ONLY has Menu button */}
-          <div className="flex items-center gap-2">
-            <div className="hidden lg:flex items-center gap-2">
-              <ThemeToggle scrolled={scrolled} />
-              <ButtonLink
-                href="/#contact"
-                variant="primary"
-                size="sm"
-                withArrow
-                className="pointer-events-auto min-h-11 border-0 shadow-none"
-              >
-                Plan a trip
-              </ButtonLink>
-            </div>
+          {/* Right Actions: Desktop has ThemeToggle + Plan a trip; Mobile has Plan a trip + Menu */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <ThemeToggle scrolled={scrolled} className="hidden lg:inline-flex" />
+            <ButtonLink
+              href="/#contact"
+              variant="primary"
+              size="sm"
+              withArrow
+              className="pointer-events-auto inline-flex min-h-10 sm:min-h-11 px-3 sm:px-4 py-1.5 text-xs sm:text-sm border-0 shadow-none"
+            >
+              Plan a trip
+            </ButtonLink>
             <button
               ref={toggleBtnRef}
               type="button"
@@ -144,7 +142,7 @@ export function Navbar() {
               aria-label={open ? "Close navigation menu" : "Open navigation menu"}
               className={cn(
                 glassPill,
-                "inline-flex lg:hidden h-11 items-center gap-2 px-4 text-xs font-medium text-ink cursor-pointer"
+                "inline-flex lg:hidden h-10 sm:h-11 items-center gap-1.5 sm:gap-2 px-3 sm:px-4 text-xs font-medium text-ink cursor-pointer"
               )}
             >
               {open ? (

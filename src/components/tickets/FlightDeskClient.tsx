@@ -263,7 +263,7 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
           <nav
             aria-label="Switch travel service desk"
-            className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 p-1"
+            className="inline-flex items-center gap-0.5 sm:gap-1 rounded-full bg-black/50 backdrop-blur-md border border-white/20 p-1 max-w-full overflow-x-auto no-scrollbar"
           >
             {SERVICE_TABS.map((tab) => {
               const Icon = tab.icon;
@@ -274,8 +274,8 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
                   aria-current={tab.active ? "page" : undefined}
                   className={
                     tab.active
-                      ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
-                      : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
+                      ? "inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-medium text-ink shadow-xs shrink-0 whitespace-nowrap"
+                      : "inline-flex items-center gap-1.5 rounded-full px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-medium text-white/85 hover:text-white transition-colors shrink-0 whitespace-nowrap"
                   }
                 >
                   <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
@@ -299,7 +299,7 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
                   aria-checked={tripType === mode}
                   onClick={() => setTripType(mode)}
                   className={cn(
-                    "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer",
+                    "rounded-full px-3 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-medium transition-colors cursor-pointer shrink-0",
                     tripType === mode
                       ? "bg-white text-ink shadow-xs"
                       : "text-white/85 hover:text-white"
@@ -310,7 +310,7 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
               ))}
             </div>
 
-            <span className="hidden sm:inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-1.5 text-xs font-medium text-white">
+            <span className="hidden sm:inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-1.5 text-xs font-medium text-white shrink-0">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               Live Carrier Inventory
             </span>
@@ -321,8 +321,8 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
         <div className="relative z-10 max-w-3xl space-y-3.5 my-auto">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white/95">
             <span>Direct &amp; 1-stop routes</span>
-            <span className="h-1 w-1 rounded-full bg-white/60" />
-            <span className="font-mono text-white/85">Baggage included</span>
+            <span className="hidden sm:inline-block h-1 w-1 rounded-full bg-white/60" />
+            <span className="hidden sm:inline font-mono text-white/85">Baggage included</span>
           </div>
           <h1 className="text-[clamp(2.25rem,4.5vw,3.75rem)] font-medium tracking-[-0.03em] leading-[1.08] text-white">
             Direct &amp; one-stop flights worldwide.
