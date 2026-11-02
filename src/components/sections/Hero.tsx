@@ -76,16 +76,64 @@ export function Hero() {
                   0.42
                 );
 
-              gsap.to("[data-hero-parallax]", {
-                yPercent: 10,
-                ease: "none",
-                scrollTrigger: {
-                  trigger: root.current,
-                  start: "top top",
-                  end: "bottom top",
-                  scrub: true,
+              // Hero scroll interaction:
+              // At scroll = 0, image and canopy are 100x100 (full-bleed, magnified).
+              // As user scrolls down, it smoothly zooms out into the resting card container position.
+              gsap.fromTo(
+                "[data-hero-parallax]",
+                {
+                  scale: 1.18,
+                  yPercent: -2,
                 },
-              });
+                {
+                  scale: 1.0,
+                  yPercent: 8,
+                  ease: "power1.out",
+                  scrollTrigger: {
+                    trigger: root.current,
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: 1.2,
+                  },
+                }
+              );
+
+              gsap.fromTo(
+                "[data-hero-card]",
+                {
+                  scale: 1.025,
+                  borderRadius: "0px",
+                },
+                {
+                  scale: 1.0,
+                  borderRadius: "24px",
+                  ease: "power1.out",
+                  transformOrigin: "center top",
+                  scrollTrigger: {
+                    trigger: root.current,
+                    start: "top top",
+                    end: "+=450",
+                    scrub: 1.2,
+                  },
+                }
+              );
+
+              gsap.fromTo(
+                "[data-hero='image'], [data-hero-scrim]",
+                {
+                  borderRadius: "0px",
+                },
+                {
+                  borderRadius: "24px",
+                  ease: "power1.out",
+                  scrollTrigger: {
+                    trigger: root.current,
+                    start: "top top",
+                    end: "+=450",
+                    scrub: 1.2,
+                  },
+                }
+              );
             })
           : () => {};
 
@@ -108,7 +156,10 @@ export function Hero() {
     >
       <Container>
         {/* Full-width rounded hero photo with headline, CTAs, and SearchTabs ALL inside */}
-        <div className="relative w-full rounded-[24px] lg:h-[calc(100svh-var(--navbar-h)-var(--gutter))] lg:min-h-[620px] lg:max-h-[960px] flex flex-col justify-end p-3.5 sm:p-5 md:p-6">
+        <div
+          data-hero-card
+          className="relative w-full rounded-[24px] lg:h-[calc(100svh-var(--navbar-h)-var(--gutter))] lg:min-h-[620px] lg:max-h-[960px] flex flex-col justify-end p-3.5 sm:p-5 md:p-6"
+        >
           {/* Background Image Layer (z-0, registered for DOM-synced WebGL plane at z-[2]) */}
           <div
             ref={heroWebGLRef}
@@ -136,6 +187,7 @@ export function Hero() {
           {/* Soft bottom scrim (z-[3], above WebGL plane at z-[2] so white text contrast is always preserved) */}
           <div
             aria-hidden="true"
+            data-hero-scrim
             className="pointer-events-none absolute inset-0 z-[3] rounded-[24px] bg-gradient-to-t from-black/80 via-black/38 to-black/10"
           />
 
