@@ -39,8 +39,8 @@ function computeSlotGeometry(
   const sideGroupW = Math.floor((trackWidth - featuredW - gap * 2) / 2);
   const thumbW = Math.max(96, Math.floor((sideGroupW - gap) / 2));
   const thumbMediaH = Math.min(
-    trackHeight - captionH,
-    Math.round(thumbW * 1.32)
+    trackHeight - captionH - 24,
+    Math.round(thumbW * 1.5)
   );
   const thumbTotalH = thumbMediaH + captionH;
   const thumbY = Math.round((trackHeight - thumbTotalH) / 2);
@@ -439,7 +439,7 @@ export function DestinationsSection() {
         <div
           ref={trackRef}
           data-reveal
-          className="hidden lg:block relative w-full h-[470px] xl:h-[510px] overflow-hidden select-none"
+          className="hidden lg:block relative w-full h-[540px] xl:h-[590px] overflow-hidden select-none"
         >
 
           {/* Persistent Destination Cards on the Horizontal Track */}
@@ -583,7 +583,7 @@ export function DestinationsSection() {
                 href={`/hotels?city=${encodeURIComponent(dest.name)}`}
                 className="group snap-start shrink-0 w-[78vw] sm:w-[44vw] block"
               >
-                <div className="relative aspect-[4/5] w-full rounded-[24px] overflow-hidden border border-line bg-ink p-5 flex flex-col justify-between">
+                <div className="relative h-[430px] sm:h-[470px] w-full rounded-[24px] overflow-hidden border border-line bg-ink p-5 flex flex-col justify-between">
                   <Image
                     src={dest.image}
                     alt={`${dest.name}, ${dest.country}`}
