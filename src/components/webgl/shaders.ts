@@ -9,13 +9,6 @@ export const VERTEX_SHADER = /* glsl */ `
   void main() {
     vUv = uv;
     vec3 pos = position;
-
-    // Subtle scroll-velocity wave distortion (clamped for tasteful, minimal feel)
-    float vel = clamp(uVelocity * 0.00045, -0.035, 0.035);
-    float wave = sin(uv.y * 3.14159265) * sin(uv.x * 3.14159265);
-    pos.y += vel * wave * 0.65;
-    pos.x += vel * cos(uv.y * 6.2831853 + uTime * 1.5) * 0.15;
-
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
   }
 `;
@@ -86,25 +79,11 @@ export const FRAGMENT_SHADER = /* glsl */ `
     }
 
     vec2 baseUv = getCoverUv(vUv, uPlaneSize, uTextureSize, uAlignY, uZoom);
+    vec2 sampleUv = clamp(baseUv, 0.002, 0.998);
 
-    // Soft mouse ripple in aspect-corrected UV space
-    vec2 aspect = vec2(uPlaneSize.x / max(uPlaneSize.y, 1.0), 1.0);
-    vec2 diff = (vUv - uMouse) * aspect;
-    float dist = length(diff);
-    float rippleWave = sin(dist * 20.0 - uTime * 3.8) * exp(-dist * 5.5);
-    vec2 dir = dist > 0.0001 ? normalize(diff) : vec2(0.0);
-    vec2 rippleOffset = dir * rippleWave * 0.0038 * uHover;
-
-    // Subtle velocity distortion + RGB shift (max ~2-3px equivalent)
-    float velNorm = clamp(uVelocity * 0.00018, -0.0032, 0.0032);
-    vec2 velOffset = vec2(0.0, velNorm * sin(vUv.x * 3.14159265));
-
-    vec2 sampleUv = clamp(baseUv + rippleOffset + velOffset, 0.002, 0.998);
-    vec2 rgbShift = vec2(velNorm * 0.45, velNorm * 0.85) + rippleOffset * 0.35;
-
-    float r = texture2D(uTexture, clamp(sampleUv + rgbShift, 0.002, 0.998)).r;
+    float r = texture2D(uTexture, sampleUv).r;
     float g = texture2D(uTexture, sampleUv).g;
-    float b = texture2D(uTexture, clamp(sampleUv - rgbShift, 0.002, 0.998)).b;
+    float b = texture2D(uTexture, sampleUv).b;
 
     vec3 color = vec3(r, g, b);
     if (uBorderWidth > 0.1) {

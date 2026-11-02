@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { ThemeToggle } from "./ThemeToggle";
-import { gsap, useGSAP, ScrollTrigger, MOTION_OK } from "@/lib/gsap";
+import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -19,7 +19,6 @@ export function Navbar() {
   const headerRef = useRef<HTMLElement>(null);
   const toggleBtnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -39,32 +38,6 @@ export function Navbar() {
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
-
-  useGSAP(
-    (_, contextSafe) => {
-      const mm = gsap.matchMedia();
-      mm.add(MOTION_OK, () => {
-        const init = contextSafe
-          ? contextSafe(() => {
-              if (!progressRef.current) return;
-              gsap.set(progressRef.current, { scaleX: 0, transformOrigin: "left center" });
-              ScrollTrigger.create({
-                start: 0,
-                end: "max",
-                onUpdate: (self) => {
-                  if (progressRef.current) {
-                    gsap.set(progressRef.current, { scaleX: self.progress });
-                  }
-                },
-              });
-            })
-          : () => {};
-        const rafId = requestAnimationFrame(init);
-        return () => cancelAnimationFrame(rafId);
-      });
-    },
-    { scope: headerRef, dependencies: [pathname] }
-  );
 
   useGSAP(
     () => {
@@ -110,11 +83,11 @@ export function Navbar() {
             <span>Velora</span>
           </Link>
 
-          {/* Center Navigation Glass Pill + subtle scroll progress bar */}
+          {/* Center Navigation Glass Pill */}
           <div
             className={cn(
               glassPill,
-              "hidden lg:flex relative items-center overflow-hidden px-1.5 py-1"
+              "hidden lg:flex relative items-center px-1.5 py-1"
             )}
           >
             <ul className="flex items-center gap-0.5">
@@ -139,32 +112,20 @@ export function Navbar() {
                 );
               })}
             </ul>
-            <span
-              ref={progressRef}
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-x-3 bottom-0 h-[1.5px] origin-left scale-x-0 bg-ink/35"
-            />
           </div>
 
-          {/* Right Actions Glass Pills */}
+          {/* Right Actions: ThemeToggle glass pill + Solid ink "Plan a trip" pill (zero border) */}
           <div className="flex items-center gap-2">
             <ThemeToggle scrolled={scrolled} />
-            <div
-              className={cn(
-                glassPill,
-                "hidden sm:flex items-center p-1"
-              )}
+            <ButtonLink
+              href="/#contact"
+              variant="primary"
+              size="sm"
+              withArrow
+              className="pointer-events-auto hidden sm:inline-flex min-h-11 border-0 shadow-none"
             >
-              <ButtonLink
-                href="/#contact"
-                variant="primary"
-                size="sm"
-                withArrow
-                className="min-h-9"
-              >
-                Plan a trip
-              </ButtonLink>
-            </div>
+              Plan a trip
+            </ButtonLink>
             <button
               ref={toggleBtnRef}
               type="button"
