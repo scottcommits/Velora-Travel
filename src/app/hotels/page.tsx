@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function HotelsPage() {
   return (
-    <main id="main" className="flex-1 pt-20 pb-12 md:pb-16">
+    <main id="main" className="flex-1 pt-2 pb-12 md:pb-16">
       <Container>
         <Suspense fallback={<CardSkeleton count={6} />}>
           <HotelDeskClient initialHotels={hotels} />
