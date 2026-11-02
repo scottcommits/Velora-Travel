@@ -23,32 +23,38 @@ export function CtaBannerSection() {
   useReveal(scope);
 
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
-        if (!scope.current) return;
-        const photos = gsap.utils.toArray<HTMLElement>(
-          "[data-cta-photo]",
-          scope.current
-        );
-        if (!photos.length) return;
-        gsap.fromTo(
-          photos,
-          { autoAlpha: 0, y: 28, scale: 0.94 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.85,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: scope.current,
-              start: "top 85%",
-              once: true,
-            },
-          }
-        );
+        const init = contextSafe
+          ? contextSafe(() => {
+              if (!scope.current) return;
+              const photos = gsap.utils.toArray<HTMLElement>(
+                "[data-cta-photo]",
+                scope.current
+              );
+              if (!photos.length) return;
+              gsap.fromTo(
+                photos,
+                { autoAlpha: 0, y: 28, scale: 0.94 },
+                {
+                  autoAlpha: 1,
+                  y: 0,
+                  scale: 1,
+                  duration: 0.85,
+                  stagger: 0.1,
+                  ease: "power3.out",
+                  scrollTrigger: {
+                    trigger: scope.current,
+                    start: "top 85%",
+                    once: true,
+                  },
+                }
+              );
+            })
+          : () => {};
+        const rafId = requestAnimationFrame(init);
+        return () => cancelAnimationFrame(rafId);
       });
     },
     { scope }

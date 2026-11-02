@@ -41,20 +41,26 @@ export function Navbar() {
   }, [open]);
 
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
-        if (!progressRef.current) return;
-        gsap.set(progressRef.current, { scaleX: 0, transformOrigin: "left center" });
-        ScrollTrigger.create({
-          start: 0,
-          end: "max",
-          onUpdate: (self) => {
-            if (progressRef.current) {
-              gsap.set(progressRef.current, { scaleX: self.progress });
-            }
-          },
-        });
+        const init = contextSafe
+          ? contextSafe(() => {
+              if (!progressRef.current) return;
+              gsap.set(progressRef.current, { scaleX: 0, transformOrigin: "left center" });
+              ScrollTrigger.create({
+                start: 0,
+                end: "max",
+                onUpdate: (self) => {
+                  if (progressRef.current) {
+                    gsap.set(progressRef.current, { scaleX: self.progress });
+                  }
+                },
+              });
+            })
+          : () => {};
+        const rafId = requestAnimationFrame(init);
+        return () => cancelAnimationFrame(rafId);
       });
     },
     { scope: headerRef, dependencies: [pathname] }

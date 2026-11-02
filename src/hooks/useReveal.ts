@@ -12,29 +12,28 @@ export function useReveal(scope: RefObject<HTMLElement | null>, deps: unknown[] 
         const els = gsap.utils.toArray<HTMLElement>("[data-reveal]", scope.current);
         if (!els.length) return;
         gsap.set(els, { autoAlpha: 0, y: 24 });
-        ScrollTrigger.batch(els, {
-          start: "top 90%",
-          once: true,
-          onEnter: (batch) =>
-            gsap.to(batch, {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.8,
-              ease: "power3.out",
-              stagger: 0.08,
-              overwrite: true,
-              clearProps: "transform",
-            }),
+
+        let triggers: ScrollTrigger[] = [];
+        const rafId = requestAnimationFrame(() => {
+          triggers = ScrollTrigger.batch(els, {
+            start: "top 90%",
+            once: true,
+            onEnter: (batch) =>
+              gsap.to(batch, {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power3.out",
+                stagger: 0.08,
+                overwrite: true,
+                clearProps: "transform",
+              }),
+          });
         });
 
-        const onLoad = () => ScrollTrigger.refresh();
-        if (document.readyState === "complete") {
-          ScrollTrigger.refresh();
-        } else {
-          window.addEventListener("load", onLoad, { once: true });
-        }
         return () => {
-          window.removeEventListener("load", onLoad);
+          cancelAnimationFrame(rafId);
+          triggers.forEach((t) => t.kill());
         };
       });
     },

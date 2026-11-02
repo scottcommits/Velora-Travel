@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { sectionPhotography } from "@/data/stats";
-import { BLUR_DATA_URL } from "@/lib/utils";
 import { gsap, useGSAP, SplitText, MOTION_OK } from "@/lib/gsap";
 import { useWebGLImage } from "@/hooks/useWebGLImage";
 import { Container } from "@/components/ui/Container";
@@ -20,79 +19,80 @@ export function Hero() {
   );
 
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
-        if (!root.current) return;
-        const headline = root.current.querySelector<HTMLElement>(
-          "[data-hero='headline']"
-        );
         let split: SplitText | undefined;
+        const runIntro = contextSafe
+          ? contextSafe(() => {
+              if (!root.current) return;
+              const headline = root.current.querySelector<HTMLElement>(
+                "[data-hero='headline']"
+              );
 
-        if (headline) {
-          gsap.set(headline, { autoAlpha: 1 });
-          split = SplitText.create(headline, { type: "words", mask: "words" });
-          split.masks.forEach((m) => {
-            const el = m as HTMLElement;
-            el.style.paddingBottom = "0.14em";
-            el.style.marginBottom = "-0.14em";
-          });
-        }
+              if (headline) {
+                gsap.set(headline, { autoAlpha: 1 });
+                split = SplitText.create(headline, { type: "words", mask: "words" });
+                split.masks.forEach((m) => {
+                  const el = m as HTMLElement;
+                  el.style.paddingBottom = "0.14em";
+                  el.style.marginBottom = "-0.14em";
+                });
+              }
 
-        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+              const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-        tl.fromTo(
-          "[data-hero='image']",
-          { autoAlpha: 0, scale: 1.03 },
-          { autoAlpha: 1, scale: 1, duration: 1.0, ease: "power2.out" },
-          0
-        )
-          .fromTo(
-            "[data-hero='eyebrow']",
-            { autoAlpha: 0, y: 14 },
-            { autoAlpha: 1, y: 0, duration: 0.6 },
-            0.12
-          );
+              tl.fromTo(
+                "[data-hero='eyebrow']",
+                { autoAlpha: 0, y: 14 },
+                { autoAlpha: 1, y: 0, duration: 0.6 },
+                0.05
+              );
 
-        if (split?.words?.length) {
-          tl.from(
-            split.words,
-            { yPercent: 105, duration: 0.75, stagger: 0.05 },
-            0.18
-          );
-        }
+              if (split?.words?.length) {
+                tl.from(
+                  split.words,
+                  { yPercent: 105, duration: 0.75, stagger: 0.05 },
+                  0.1
+                );
+              }
 
-        tl.fromTo(
-          "[data-hero='sub']",
-          { autoAlpha: 0, y: 16 },
-          { autoAlpha: 1, y: 0, duration: 0.65 },
-          0.35
-        )
-          .fromTo(
-            "[data-hero='cta']",
-            { autoAlpha: 0, y: 16 },
-            { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.08 },
-            0.45
-          )
-          .fromTo(
-            "[data-hero='widget']",
-            { autoAlpha: 0, y: 24 },
-            { autoAlpha: 1, y: 0, duration: 0.75 },
-            0.52
-          );
+              tl.fromTo(
+                "[data-hero='sub']",
+                { autoAlpha: 0, y: 16 },
+                { autoAlpha: 1, y: 0, duration: 0.65 },
+                0.26
+              )
+                .fromTo(
+                  "[data-hero='cta']",
+                  { autoAlpha: 0, y: 16 },
+                  { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.08 },
+                  0.36
+                )
+                .fromTo(
+                  "[data-hero='widget']",
+                  { autoAlpha: 0, y: 24 },
+                  { autoAlpha: 1, y: 0, duration: 0.75 },
+                  0.42
+                );
 
-        gsap.to("[data-hero-parallax]", {
-          yPercent: 10,
-          ease: "none",
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
+              gsap.to("[data-hero-parallax]", {
+                yPercent: 10,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: root.current,
+                  start: "top top",
+                  end: "bottom top",
+                  scrub: true,
+                },
+              });
+            })
+          : () => {};
+
+        const rafId = requestAnimationFrame(runIntro);
 
         return () => {
+          cancelAnimationFrame(rafId);
           split?.revert();
         };
       });
@@ -125,8 +125,7 @@ export function Hero() {
                 fill
                 preload
                 fetchPriority="high"
-                placeholder="blur"
-                blurDataURL={BLUR_DATA_URL}
+                decoding="sync"
                 sizes="98vw"
                 className="object-cover object-[center_35%]"
               />

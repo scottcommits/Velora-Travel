@@ -12,26 +12,32 @@ export function HowItWorksSection() {
   useReveal(scope);
 
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
-        if (!scope.current) return;
-        const line = scope.current.querySelector("[data-step-line]");
-        if (!line) return;
-        gsap.fromTo(
-          line,
-          { scaleX: 0, transformOrigin: "left center" },
-          {
-            scaleX: 1,
-            duration: 1.1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: scope.current,
-              start: "top 80%",
-              once: true,
-            },
-          }
-        );
+        const init = contextSafe
+          ? contextSafe(() => {
+              if (!scope.current) return;
+              const line = scope.current.querySelector("[data-step-line]");
+              if (!line) return;
+              gsap.fromTo(
+                line,
+                { scaleX: 0, transformOrigin: "left center" },
+                {
+                  scaleX: 1,
+                  duration: 1.1,
+                  ease: "power2.out",
+                  scrollTrigger: {
+                    trigger: scope.current,
+                    start: "top 80%",
+                    once: true,
+                  },
+                }
+              );
+            })
+          : () => {};
+        const rafId = requestAnimationFrame(init);
+        return () => cancelAnimationFrame(rafId);
       });
     },
     { scope }

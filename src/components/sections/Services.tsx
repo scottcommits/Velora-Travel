@@ -54,7 +54,7 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
       data-reveal
       className={cn(
         "group relative flex flex-col justify-between rounded-[20px] border border-line bg-surface p-2 md:p-2.5 transition-colors hover:border-ink/40",
-        isOffset && "lg:translate-y-7"
+        isOffset ? "lg:mt-7" : "lg:mb-7"
       )}
     >
       <div>
@@ -131,7 +131,7 @@ export function ServicesSection() {
           subtitle="Book each service independently or combine them into a single itinerary."
         />
 
-        <div className="mt-5 md:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:pb-7">
+        <div className="mt-5 md:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {servicesOverview.map((service, idx) => (
             <ServiceItem key={service.id} item={service} index={idx} />
           ))}

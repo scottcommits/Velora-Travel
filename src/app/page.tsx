@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Hero } from "@/components/sections/Hero";
 import { WhyChooseUsSection } from "@/components/sections/WhyChooseUs";
 import { DestinationsSection } from "@/components/sections/Destinations";
@@ -11,13 +12,27 @@ export default function HomePage() {
   return (
     <main id="main" className="flex-1">
       <Hero />
-      <WhyChooseUsSection />
-      <DestinationsSection />
-      <ServicesSection />
-      <HowItWorksSection />
-      <TestimonialsSection />
-      <ContactSection />
-      <CtaBannerSection />
+      <Suspense>
+        <WhyChooseUsSection />
+      </Suspense>
+      <Suspense>
+        <DestinationsSection />
+      </Suspense>
+      <Suspense>
+        <ServicesSection />
+      </Suspense>
+      <Suspense>
+        <HowItWorksSection />
+      </Suspense>
+      <Suspense>
+        <TestimonialsSection />
+      </Suspense>
+      <Suspense>
+        <ContactSection />
+      </Suspense>
+      <Suspense>
+        <CtaBannerSection />
+      </Suspense>
     </main>
   );
 }

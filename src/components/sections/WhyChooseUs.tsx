@@ -21,45 +21,51 @@ export function WhyChooseUsSection() {
   useReveal(scope);
 
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
-        if (!scope.current) return;
-        const counters = gsap.utils.toArray<HTMLElement>(
-          "[data-count]",
-          scope.current
-        );
-        counters.forEach((el) => {
-          const end = Number(el.dataset.count ?? "0");
-          const suffix = el.dataset.suffix ?? "";
-          const state = { value: 0 };
-          el.textContent = "0" + suffix;
+        const init = contextSafe
+          ? contextSafe(() => {
+              if (!scope.current) return;
+              const counters = gsap.utils.toArray<HTMLElement>(
+                "[data-count]",
+                scope.current
+              );
+              counters.forEach((el) => {
+                const end = Number(el.dataset.count ?? "0");
+                const suffix = el.dataset.suffix ?? "";
+                const state = { value: 0 };
+                el.textContent = "0" + suffix;
 
-          gsap.to(state, {
-            value: end,
-            duration: 1.6,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 90%",
-              once: true,
-            },
-            onUpdate: () => {
-              el.textContent = formatNumber(Math.round(state.value)) + suffix;
-            },
-          });
-        });
+                gsap.to(state, {
+                  value: end,
+                  duration: 1.6,
+                  ease: "power2.out",
+                  scrollTrigger: {
+                    trigger: el,
+                    start: "top 90%",
+                    once: true,
+                  },
+                  onUpdate: () => {
+                    el.textContent = formatNumber(Math.round(state.value)) + suffix;
+                  },
+                });
+              });
 
-        gsap.to("[data-about-parallax]", {
-          yPercent: 8,
-          ease: "none",
-          scrollTrigger: {
-            trigger: scope.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
+              gsap.to("[data-about-parallax]", {
+                yPercent: 8,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: scope.current,
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: true,
+                },
+              });
+            })
+          : () => {};
+        const rafId = requestAnimationFrame(init);
+        return () => cancelAnimationFrame(rafId);
       });
     },
     { scope }

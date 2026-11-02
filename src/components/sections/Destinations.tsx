@@ -106,7 +106,6 @@ export function DestinationsSection() {
                         src={item.image}
                         alt={`${item.name}, ${item.country}`}
                         fill
-                        loading="eager"
                         placeholder="blur"
                         blurDataURL={BLUR_DATA_URL}
                         sizes="180px"
@@ -142,7 +141,6 @@ export function DestinationsSection() {
                   src={featured.image}
                   alt={`${featured.name}, ${featured.country}`}
                   fill
-                  loading="eager"
                   placeholder="blur"
                   blurDataURL={BLUR_DATA_URL}
                   sizes="(min-width: 1024px) 54vw, 95vw"
@@ -237,7 +235,6 @@ export function DestinationsSection() {
                         src={item.image}
                         alt={`${item.name}, ${item.country}`}
                         fill
-                        loading="eager"
                         placeholder="blur"
                         blurDataURL={BLUR_DATA_URL}
                         sizes="180px"
@@ -290,7 +287,6 @@ export function DestinationsSection() {
                     src={dest.image}
                     alt={`${dest.name}, ${dest.country}`}
                     fill
-                    loading="eager"
                     placeholder="blur"
                     blurDataURL={BLUR_DATA_URL}
                     sizes="(min-width: 640px) 44vw, 78vw"

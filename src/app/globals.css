@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 :root {
   --bg: #F4F4F2;
   --surface: #FFFFFF;
@@ -139,9 +141,10 @@ input[type="range"].velora-range::-moz-range-thumb {
   transition: transform 0.15s ease;
 }
 
-/* Pre-hide CSS for GSAP motion only when user has no preference for reduced motion */
+/* Pre-hide CSS for GSAP motion only when user has no preference for reduced motion.
+   Never hide [data-hero="image"] so the LCP hero photo paints immediately from SSR HTML. */
 @media (prefers-reduced-motion: no-preference) {
-  [data-hero],
+  [data-hero]:not([data-hero="image"]),
   [data-reveal] {
     visibility: hidden;
   }
