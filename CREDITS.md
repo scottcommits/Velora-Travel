@@ -4,7 +4,7 @@ All photography used in Velora is sourced from Unsplash under the free-to-use [U
 
 | File | Photographer | Source | License |
 |---|---|---|---|
-| `hero/coastal-horizon.jpg` | Sean Oulashin | https://unsplash.com/photos/KMn4VEeEPR8 (`photo-1507525428034-b723cf961d3e`) | Unsplash License |
+| `hero/coastal-horizon.jpg` | Pietro De Grandi | https://unsplash.com/photos/T7K4aEPoGGk (`photo-1501785888041-af3ef285b470`) | Unsplash License |
 | `hero/alpine-lake-boat.jpg` | Luca Bravo | https://unsplash.com/photos/O453M2Liufs (`photo-1476514525535-07fb3b4ae5f1`) | Unsplash License |
 | `about/island-lagoon.jpg` | Shifaaz Shamoon | https://unsplash.com/photos/sLAk1guBG90 (`photo-1506929562872-bb421503ef21`) | Unsplash License |
 | `about/turquoise-boats.jpg` | Humphrey Muleba | https://unsplash.com/photos/LOA2mTj1vhc (`photo-1559128010-7c1ad6e1b6a5`) | Unsplash License |

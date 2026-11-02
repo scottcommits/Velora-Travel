@@ -1,12 +1,20 @@
-import { Calendar, ChevronDown, ArrowUpRight, Search } from "lucide-react";
-import { cn, formatUsd } from "@/lib/utils";
-import type {
-  InputHTMLAttributes,
-  SelectHTMLAttributes,
-  TextareaHTMLAttributes,
-  ButtonHTMLAttributes,
-  ReactNode,
+"use client";
+
+import {
+  Children,
+  isValidElement,
+  useEffect,
+  useRef,
+  useState,
+  type InputHTMLAttributes,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
+  type ButtonHTMLAttributes,
+  type ReactNode,
+  type ChangeEvent,
 } from "react";
+import { Calendar, ChevronDown, ArrowUpRight, Search, Check } from "lucide-react";
+import { cn, formatUsd } from "@/lib/utils";
 
 /* ==========================================================================
    Form Inputs (Contact form, Modal form) - 48px height, 14px radius, error red
@@ -199,6 +207,33 @@ export function SearchBarShell({
 export interface BarSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   wrapperClassName?: string;
+  menuDirection?: "up" | "down";
+}
+
+interface ParsedOption {
+  value: string;
+  label: string;
+}
+
+function extractOptions(children: ReactNode): ParsedOption[] {
+  const result: ParsedOption[] = [];
+  Children.forEach(children, (child) => {
+    if (
+      isValidElement<{ value?: string | number; children?: ReactNode }>(child) &&
+      child.type === "option"
+    ) {
+      const val = String(child.props.value ?? "");
+      const text =
+        typeof child.props.children === "string" ||
+        typeof child.props.children === "number"
+          ? String(child.props.children)
+          : Array.isArray(child.props.children)
+            ? child.props.children.join("")
+            : val;
+      result.push({ value: val, label: text.trim() });
+    }
+  });
+  return result;
 }
 
 export function BarSelect({
@@ -207,38 +242,168 @@ export function BarSelect({
   wrapperClassName,
   className,
   children,
+  value,
+  onChange,
+  menuDirection = "down",
   ...props
 }: BarSelectProps) {
+  const [open, setOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(menuDirection === "up");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const options = extractOptions(children);
+  const currentValue = value !== undefined ? String(value) : (options[0]?.value ?? "");
+  const selectedOption =
+    options.find((o) => o.value === currentValue) ?? options[0] ?? { value: "", label: "" };
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onPointerDown = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  const handleToggle = () => {
+    if (!open && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setOpenUpward(menuDirection === "up" || spaceBelow < 240);
+    }
+    setOpen((prev) => !prev);
+  };
+
+  const handleSelectOption = (nextVal: string) => {
+    if (onChange) {
+      const syntheticEvent = {
+        target: { value: nextVal, id: id ?? "" },
+        currentTarget: { value: nextVal, id: id ?? "" },
+      } as unknown as ChangeEvent<HTMLSelectElement>;
+      onChange(syntheticEvent);
+    }
+    setOpen(false);
+  };
+
+  const labelId = id ? `${id}-label` : undefined;
+  const listboxId = id ? `${id}-listbox` : undefined;
+
   return (
     <div
+      ref={containerRef}
       className={cn(
         "relative flex flex-col justify-center px-3.5 py-1.5 min-h-[54px]",
         wrapperClassName
       )}
     >
-      <label
-        htmlFor={id}
-        className="text-[11px] font-medium text-ink-muted leading-tight select-none"
+      {/* Hidden native select kept under the hood for form/accessibility compatibility */}
+      <select
+        id={id}
+        value={currentValue}
+        onChange={onChange}
+        tabIndex={-1}
+        aria-hidden="true"
+        className="sr-only pointer-events-none"
+        {...props}
+      >
+        {children}
+      </select>
+
+      <span
+        id={labelId}
+        onClick={handleToggle}
+        className="text-[11px] font-medium text-ink-muted leading-tight select-none cursor-pointer"
       >
         {label}
-      </label>
-      <div className="relative flex items-center mt-0.5">
-        <select
-          id={id}
-          className={cn(
-            "w-full appearance-none bg-transparent pr-5 text-[15px] font-medium text-ink leading-snug focus:outline-none cursor-pointer truncate",
-            className
-          )}
-          {...props}
-        >
-          {children}
-        </select>
-        <ChevronDown
+      </span>
+
+      <button
+        type="button"
+        role="combobox"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-controls={listboxId}
+        aria-labelledby={labelId}
+        onClick={handleToggle}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            e.preventDefault();
+            if (!open) {
+              handleToggle();
+              return;
+            }
+            const idx = options.findIndex((o) => o.value === currentValue);
+            const delta = e.key === "ArrowDown" ? 1 : -1;
+            const nextIdx = (idx + delta + options.length) % options.length;
+            const nextOpt = options[nextIdx];
+            if (nextOpt) handleSelectOption(nextOpt.value);
+          }
+        }}
+        className={cn(
+          "group relative mt-0.5 flex w-full items-center justify-between gap-2 appearance-none bg-transparent text-left text-[15px] font-medium text-ink leading-snug focus:outline-none cursor-pointer",
+          className
+        )}
+      >
+        <span className="truncate">{selectedOption.label}</span>
+        <span
           aria-hidden="true"
-          strokeWidth={1.6}
-          className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-ink-muted"
-        />
-      </div>
+          className={cn(
+            "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-line bg-bg-alt/70 text-ink-muted transition-all duration-200 group-hover:border-ink/35 group-hover:text-ink",
+            open && "rotate-180 border-ink bg-ink text-bg"
+          )}
+        >
+          <ChevronDown className="h-3 w-3" strokeWidth={1.8} />
+        </span>
+      </button>
+
+      {open ? (
+        <ul
+          id={listboxId}
+          role="listbox"
+          aria-labelledby={labelId}
+          data-lenis-prevent
+          className={cn(
+            "absolute left-1.5 right-1.5 z-50 min-w-[200px] max-h-60 overflow-y-auto rounded-[18px] border border-line bg-surface p-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.16)]",
+            openUpward ? "bottom-full mb-2" : "top-full mt-2"
+          )}
+        >
+          {options.map((opt) => {
+            const isSelected = opt.value === currentValue;
+            return (
+              <li
+                key={opt.value}
+                role="option"
+                aria-selected={isSelected}
+                onClick={() => handleSelectOption(opt.value)}
+                className={cn(
+                  "flex items-center justify-between gap-2 rounded-[12px] px-3 py-2 text-[13.5px] font-medium transition-colors cursor-pointer select-none",
+                  isSelected
+                    ? "bg-ink text-bg"
+                    : "text-ink hover:bg-bg-alt"
+                )}
+              >
+                <span className="truncate">{opt.label}</span>
+                {isSelected ? (
+                  <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden="true" />
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
     </div>
   );
 }

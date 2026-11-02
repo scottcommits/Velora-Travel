@@ -10,7 +10,6 @@ import {
   SearchBarShell,
   BarSelect,
   BarDate,
-  BarInput,
   BarSubmitButton,
   PriceRangeSlider,
 } from "@/components/ui/FormFields";
@@ -24,6 +23,26 @@ const tabs: { id: TabId; label: string }[] = [
   { id: "tickets", label: "Flights" },
   { id: "hotels", label: "Hotels" },
   { id: "cars", label: "Cars" },
+];
+
+const citizenshipOptions = [
+  "United Kingdom",
+  "United States",
+  "United Arab Emirates",
+  "Canada",
+  "Germany",
+  "France",
+  "Singapore",
+  "Australia",
+];
+
+const pickupLocations = [
+  "Dubai Airport (DXB)",
+  "London Heathrow (LHR)",
+  "Istanbul Airport (IST)",
+  "Geneva Airport (GVA)",
+  "Milan Malpensa (MXP)",
+  "Paris Charles de Gaulle (CDG)",
 ];
 
 export function SearchTabs() {
@@ -248,15 +267,19 @@ export function SearchTabs() {
             ))}
           </BarSelect>
 
-          <BarInput
+          <BarSelect
             id="hero-visa-nat"
             label="Citizenship"
-            type="text"
             value={nationality}
             onChange={(e) => setNationality(e.target.value)}
-            placeholder="United Kingdom"
             wrapperClassName="col-span-1 md:col-span-3"
-          />
+          >
+            {citizenshipOptions.map((nat) => (
+              <option key={nat} value={nat} className="bg-surface text-ink">
+                {nat}
+              </option>
+            ))}
+          </BarSelect>
 
           <div className="col-span-2 md:col-span-2 md:pl-3 flex justify-end">
             <BarSubmitButton className="w-full">Search</BarSubmitButton>
@@ -440,14 +463,19 @@ export function SearchTabs() {
           onSubmit={handleCarSubmit}
           className="grid grid-cols-2 md:grid-cols-12 gap-2 md:gap-0 md:divide-x md:divide-line items-center"
         >
-          <BarInput
+          <BarSelect
             id="hero-car-city"
             label="Pickup location"
-            type="text"
             value={carCity}
             onChange={(e) => setCarCity(e.target.value)}
             wrapperClassName="col-span-2 md:col-span-4"
-          />
+          >
+            {pickupLocations.map((loc) => (
+              <option key={loc} value={loc} className="bg-surface text-ink">
+                {loc}
+              </option>
+            ))}
+          </BarSelect>
 
           <BarSelect
             id="hero-car-cat"

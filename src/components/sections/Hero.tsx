@@ -121,13 +121,14 @@ export function Hero() {
             >
               <Image
                 src={sectionPhotography.heroPrimary}
-                alt="Calm turquoise ocean horizon and sunlit sandy shore at dawn"
+                alt="Wooden boat drifting across a crystal-clear emerald alpine lake beneath sunlit Dolomite peaks"
                 fill
                 preload
                 fetchPriority="high"
                 decoding="sync"
+                quality={85}
                 sizes="98vw"
-                className="object-cover object-[center_35%]"
+                className="object-cover object-[center_42%]"
               />
             </div>
           </div>
