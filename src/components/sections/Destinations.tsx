@@ -14,6 +14,9 @@ import { Container } from "@/components/ui/Container";
 export function DestinationsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const featuredRef = useRef<HTMLDivElement>(null);
+  const imageLayersRef = useRef<(HTMLDivElement | null)[]>([]);
+  const metaRef = useRef<HTMLDivElement>(null);
+  const tagsRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const featured = destinations[activeIndex] ?? destinations[0];
@@ -26,25 +29,95 @@ export function DestinationsSection() {
   useReveal(sectionRef);
   useGSAP(() => {}, { scope: sectionRef });
 
-  const switchDestination = (nextIdx: number) => {
-    const normalized = (nextIdx + destinations.length) % destinations.length;
+  const switchDestination = (nextIdx: number, explicitDir?: 1 | -1) => {
+    const len = destinations.length;
+    const normalized = (nextIdx + len) % len;
+    if (normalized === activeIndex) return;
+
+    const dir: 1 | -1 =
+      explicitDir ??
+      ((normalized - activeIndex + len) % len <= len / 2 ? 1 : -1);
+
+    const prevIdx = activeIndex;
     setActiveIndex(normalized);
+
     if (
       typeof window !== "undefined" &&
-      window.matchMedia(MOTION_OK).matches &&
-      featuredRef.current
+      window.matchMedia(MOTION_OK).matches
     ) {
-      gsap.fromTo(
-        featuredRef.current,
-        { autoAlpha: 0.25, scale: 0.985 },
-        {
-          autoAlpha: 1,
-          scale: 1,
-          duration: 0.45,
-          ease: "power2.out",
-          clearProps: "transform",
+      const outgoingEl = imageLayersRef.current[prevIdx];
+      const incomingEl = imageLayersRef.current[normalized];
+
+      const tl = gsap.timeline({ defaults: { overwrite: "auto" } });
+
+      if (outgoingEl && incomingEl) {
+        gsap.set(outgoingEl, { zIndex: 1 });
+        gsap.set(incomingEl, { zIndex: 2 });
+
+        tl.fromTo(
+          outgoingEl,
+          { autoAlpha: 1, scale: 1, xPercent: 0 },
+          {
+            autoAlpha: 0,
+            scale: dir > 0 ? 0.94 : 1.07,
+            xPercent: -dir * 6,
+            duration: 0.65,
+            ease: "power3.inOut",
+          },
+          0
+        ).fromTo(
+          incomingEl,
+          {
+            autoAlpha: 0,
+            scale: dir > 0 ? 1.1 : 0.93,
+            xPercent: dir * 6,
+          },
+          {
+            autoAlpha: 1,
+            scale: 1,
+            xPercent: 0,
+            duration: 0.72,
+            ease: "power3.out",
+          },
+          0
+        );
+      }
+
+      if (tagsRef.current) {
+        tl.fromTo(
+          tagsRef.current,
+          { autoAlpha: 0, y: -8 },
+          { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" },
+          0.08
+        );
+      }
+
+      if (metaRef.current) {
+        tl.fromTo(
+          metaRef.current,
+          { autoAlpha: 0, y: dir * 14 },
+          { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" },
+          0.06
+        );
+      }
+
+      if (sectionRef.current) {
+        const thumbs = sectionRef.current.querySelectorAll("[data-dest-thumb]");
+        if (thumbs.length) {
+          tl.fromTo(
+            thumbs,
+            { autoAlpha: 0.45, scale: 0.96 },
+            {
+              autoAlpha: 1,
+              scale: 1,
+              duration: 0.48,
+              stagger: 0.04,
+              ease: "power2.out",
+            },
+            0.04
+          );
         }
-      );
+      }
     }
   };
 
@@ -98,7 +171,8 @@ export function DestinationsSection() {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => switchDestination(idx)}
+                    data-dest-thumb
+                    onClick={() => switchDestination(idx, 1)}
                     className="group text-left cursor-pointer focus:outline-none"
                   >
                     <div className="relative aspect-[4/5] w-full rounded-[18px] overflow-hidden border border-line bg-surface">
@@ -132,23 +206,39 @@ export function DestinationsSection() {
               ref={featuredRef}
               className="relative aspect-[16/13] xl:aspect-[5/4] w-full rounded-[24px] flex flex-col justify-between p-5 md:p-7"
             >
-              {/* Background Image (z-0, registered for WebGL plane at z-[2]) */}
+              {/* Layered Background Images for smooth GSAP cross-fade + scale transitions */}
               <div
                 ref={destWebGLRef}
                 className="absolute inset-0 z-0 rounded-[24px] overflow-hidden border border-line bg-ink"
               >
-                <Image
-                  src={featured.image}
-                  alt={`${featured.name}, ${featured.country}`}
-                  fill
-                  placeholder="blur"
-                  blurDataURL={BLUR_DATA_URL}
-                  sizes="(min-width: 1024px) 54vw, 95vw"
-                  className="object-cover"
-                />
+                {destinations.map((dest, idx) => (
+                  <div
+                    key={dest.id}
+                    ref={(el) => {
+                      imageLayersRef.current[idx] = el;
+                    }}
+                    style={{
+                      opacity: idx === activeIndex ? 1 : 0,
+                      visibility: idx === activeIndex ? "visible" : "hidden",
+                      zIndex: idx === activeIndex ? 2 : 1,
+                    }}
+                    className="absolute inset-0 will-change-transform"
+                  >
+                    <Image
+                      src={dest.image}
+                      alt={`${dest.name}, ${dest.country}`}
+                      fill
+                      loading="eager"
+                      placeholder="blur"
+                      blurDataURL={BLUR_DATA_URL}
+                      sizes="(min-width: 1024px) 54vw, 95vw"
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
               </div>
 
-              {/* Scrim overlay (z-[3], above WebGL plane at z-[2]) */}
+              {/* Scrim overlay (z-[3]) */}
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 z-[3] rounded-[24px] bg-gradient-to-t from-black/80 via-black/15 to-black/40"
@@ -156,7 +246,7 @@ export function DestinationsSection() {
 
               {/* Top bar: functional tags left + prev/next arrows & "View all destinations" top-right */}
               <div className="relative z-[5] flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-2">
+                <div ref={tagsRef} className="flex flex-wrap items-center gap-2">
                   <span className="rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 text-xs font-medium text-white">
                     from {formatUsd(featured.priceFrom)}
                   </span>
@@ -168,7 +258,7 @@ export function DestinationsSection() {
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => switchDestination(activeIndex - 1)}
+                    onClick={() => switchDestination(activeIndex - 1, -1)}
                     aria-label="Previous destination"
                     className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/45 backdrop-blur-md border border-white/25 text-white hover:bg-black/65 transition-colors cursor-pointer"
                   >
@@ -176,7 +266,7 @@ export function DestinationsSection() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => switchDestination(activeIndex + 1)}
+                    onClick={() => switchDestination(activeIndex + 1, 1)}
                     aria-label="Next destination"
                     className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#0A0A0A] hover:opacity-90 transition-opacity cursor-pointer"
                   >
@@ -193,7 +283,7 @@ export function DestinationsSection() {
               </div>
 
               {/* Bottom destination title & tagline */}
-              <div className="relative z-[5] text-white space-y-1.5">
+              <div ref={metaRef} className="relative z-[5] text-white space-y-1.5">
                 <p className="font-mono text-xs text-white/80">
                   0{activeIndex + 1} / 0{destinations.length} · {featured.duration} ({featured.bestSeason})
                 </p>
@@ -227,7 +317,8 @@ export function DestinationsSection() {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => switchDestination(idx)}
+                    data-dest-thumb
+                    onClick={() => switchDestination(idx, 1)}
                     className="group text-left cursor-pointer focus:outline-none"
                   >
                     <div className="relative aspect-[4/5] w-full rounded-[18px] overflow-hidden border border-line bg-surface">

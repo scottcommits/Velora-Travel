@@ -74,53 +74,18 @@ export function CtaBannerSection() {
           className="relative rounded-[24px] border border-line bg-surface-2/80 p-5 sm:p-8 lg:p-10 overflow-hidden"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-4 items-center">
-            {/* Left / Center composition: 3 larger tilted photos overlapping container edges + integrated "Have a Question?" */}
+            {/* Left / Center composition: 3 overlapping tilted photos bleeding across edges + integrated "Have a Question?" */}
             <div className="lg:col-span-7 relative min-h-[340px] sm:min-h-[410px] lg:min-h-[440px] flex items-center">
-              {/* 3 Tilted Photos bleeding across left/top/bottom container edges */}
               <div className="relative w-full h-[320px] sm:h-[400px] lg:h-[440px]">
-                {/* Photo 1 - Top Tilted, overlapping top edge */}
+                {/* Photo 1 - Top Center-Right Tilted, overlapping top edge and Photo 2 */}
                 <div
                   ref={ctaPhotoRef1}
                   data-cta-photo
-                  className="absolute -top-8 sm:-top-12 left-14 sm:left-24 lg:left-28 w-52 sm:w-64 lg:w-72 aspect-[4/3] rounded-[20px] overflow-hidden border-2 border-surface bg-surface rotate-[7deg] z-[1]"
+                  className="absolute -top-10 sm:-top-14 left-20 sm:left-32 lg:left-36 w-56 sm:w-68 lg:w-76 aspect-[4/3] rounded-[22px] overflow-hidden border-[3px] border-surface bg-surface shadow-[0_14px_34px_rgba(0,0,0,0.12)] rotate-[9deg] z-[2]"
                 >
                   <Image
                     src={img1.src}
                     alt={img1.alt}
-                    fill
-                    placeholder="blur"
-                    blurDataURL={BLUR_DATA_URL}
-                    sizes="(min-width: 1024px) 288px, 240px"
-                    className="object-cover"
-                  />
-                </div>
-
-                {/* Photo 2 - Middle Left Tilted, overlapping left edge */}
-                <div
-                  ref={ctaPhotoRef2}
-                  data-cta-photo
-                  className="absolute top-14 sm:top-20 -left-8 sm:-left-12 w-52 sm:w-64 lg:w-72 aspect-[4/3] rounded-[20px] overflow-hidden border-2 border-surface bg-surface -rotate-[8deg] z-0"
-                >
-                  <Image
-                    src={img2.src}
-                    alt={img2.alt}
-                    fill
-                    placeholder="blur"
-                    blurDataURL={BLUR_DATA_URL}
-                    sizes="(min-width: 1024px) 288px, 240px"
-                    className="object-cover"
-                  />
-                </div>
-
-                {/* Photo 3 - Bottom Left Tilted, overlapping bottom/left edge */}
-                <div
-                  ref={ctaPhotoRef3}
-                  data-cta-photo
-                  className="absolute -bottom-8 sm:-bottom-12 left-2 sm:left-6 w-56 sm:w-68 lg:w-76 aspect-[4/3] rounded-[20px] overflow-hidden border-2 border-surface bg-surface rotate-[4deg] z-[1]"
-                >
-                  <Image
-                    src={img3.src}
-                    alt={img3.alt}
                     fill
                     placeholder="blur"
                     blurDataURL={BLUR_DATA_URL}
@@ -129,10 +94,44 @@ export function CtaBannerSection() {
                   />
                 </div>
 
-                {/* Integrated "Have a Question?" lockup anchored into the right side of the collage composition */}
+                {/* Photo 2 - Middle Left Tilted, overlapping left edge and tucked under Photo 1 & 3 */}
+                <div
+                  ref={ctaPhotoRef2}
+                  data-cta-photo
+                  className="absolute top-12 sm:top-16 -left-10 sm:-left-14 w-56 sm:w-68 lg:w-76 aspect-[4/3] rounded-[22px] overflow-hidden border-[3px] border-surface bg-surface shadow-[0_14px_34px_rgba(0,0,0,0.12)] -rotate-[10deg] z-[1]"
+                >
+                  <Image
+                    src={img2.src}
+                    alt={img2.alt}
+                    fill
+                    placeholder="blur"
+                    blurDataURL={BLUR_DATA_URL}
+                    sizes="(min-width: 1024px) 304px, 250px"
+                    className="object-cover"
+                  />
+                </div>
+
+                {/* Photo 3 - Bottom Left-Center Tilted, overlapping bottom edge and overlapping Photo 2 */}
+                <div
+                  ref={ctaPhotoRef3}
+                  data-cta-photo
+                  className="absolute -bottom-10 sm:-bottom-14 left-6 sm:left-14 lg:left-16 w-60 sm:w-72 lg:w-80 aspect-[4/3] rounded-[22px] overflow-hidden border-[3px] border-surface bg-surface shadow-[0_16px_38px_rgba(0,0,0,0.14)] rotate-[6deg] z-[3]"
+                >
+                  <Image
+                    src={img3.src}
+                    alt={img3.alt}
+                    fill
+                    placeholder="blur"
+                    blurDataURL={BLUR_DATA_URL}
+                    sizes="(min-width: 1024px) 320px, 260px"
+                    className="object-cover"
+                  />
+                </div>
+
+                {/* Integrated "Have a Question?" lockup overlapping the right edge of the photo collage */}
                 <div
                   data-reveal
-                  className="absolute right-0 sm:right-2 lg:right-4 bottom-3 sm:bottom-1/2 sm:translate-y-8 z-[5] inline-flex items-center gap-3 rounded-2xl bg-surface/85 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-none p-2.5 sm:p-0 border border-line/60 sm:border-none"
+                  className="absolute right-0 sm:right-2 lg:right-4 bottom-4 sm:bottom-12 lg:bottom-16 z-[5] inline-flex items-center gap-3 rounded-2xl bg-surface/90 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-none p-2.5 sm:p-0 border border-line/60 sm:border-none"
                 >
                   <p className="text-2xl sm:text-3xl lg:text-[34px] font-medium tracking-[-0.03em] leading-[1.06] text-ink text-right">
                     Have a

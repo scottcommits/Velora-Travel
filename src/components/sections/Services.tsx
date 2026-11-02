@@ -53,13 +53,13 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
       href={item.href}
       data-reveal
       className={cn(
-        "group relative flex flex-col justify-between rounded-[20px] border border-line bg-surface p-2 md:p-2.5 transition-colors hover:border-ink/40",
+        "group relative flex flex-col justify-between rounded-[20px] border border-line bg-surface p-1.5 md:p-2 transition-colors hover:border-ink/40",
         isOffset ? "lg:mt-7" : "lg:mb-7"
       )}
     >
       <div>
-        {/* Inset photo at top (8-10px from card edge) */}
-        <div className="relative aspect-[16/10] w-full rounded-[14px] overflow-hidden bg-surface-2">
+        {/* Tight inset photo at top (6-8px from card edge) */}
+        <div className="relative aspect-[16/10] w-full rounded-[15px] overflow-hidden bg-surface-2">
           <Image
             data-service-img
             src={item.image}
@@ -72,8 +72,8 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
           />
         </div>
 
-        {/* Text area px-3 pb-3 with bigger circular arrow button */}
-        <div className="px-3 pt-3 pb-2">
+        {/* Compact text area with circular arrow button */}
+        <div className="px-2.5 pt-2.5 pb-1.5">
           <div className="flex items-start justify-between gap-2">
             <div>
               <span className="font-mono text-[11px] text-ink-muted block">
@@ -92,13 +92,13 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
             </span>
           </div>
 
-          <p className="mt-2 text-sm text-ink-muted leading-snug">
+          <p className="mt-1.5 text-sm text-ink-muted leading-snug">
             {item.description}
           </p>
         </div>
       </div>
 
-      <div className="px-3 pb-3 pt-1 flex flex-wrap items-center gap-1.5">
+      <div className="px-2.5 pb-2 pt-1 flex flex-wrap items-center gap-1.5">
         {item.highlights.slice(0, 2).map((tag) => (
           <span
             key={tag}
