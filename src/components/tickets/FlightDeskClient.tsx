@@ -274,7 +274,7 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
                   aria-current={tab.active ? "page" : undefined}
                   className={
                     tab.active
-                      ? "inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-semibold text-ink shadow-xs shrink-0 whitespace-nowrap"
+                      ? "inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-semibold text-[#0A0A0A] shadow-xs shrink-0 whitespace-nowrap"
                       : "inline-flex items-center gap-1.5 rounded-full px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-medium text-white/85 hover:text-white transition-colors shrink-0 whitespace-nowrap"
                   }
                 >
@@ -308,7 +308,7 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
                   className={cn(
                     "rounded-full px-3 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-medium transition-colors cursor-pointer shrink-0",
                     tripType === mode
-                      ? "bg-white text-ink shadow-xs"
+                      ? "bg-white text-[#0A0A0A] shadow-xs"
                       : "text-white/85 hover:text-white"
                   )}
                 >
@@ -354,7 +354,7 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer backdrop-blur-md border",
                     isActive
-                      ? "bg-white text-ink border-white font-semibold shadow-xs"
+                      ? "bg-white text-[#0A0A0A] border-white font-semibold shadow-xs"
                       : "bg-black/35 text-white/90 border-white/20 hover:bg-white/20 hover:text-white"
                   )}
                 >
