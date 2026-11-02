@@ -325,7 +325,7 @@ export function SearchBarShell({
   return (
     <div
       className={cn(
-        "rounded-[24px] border border-line bg-surface p-2 md:p-2.5",
+        "relative z-20 rounded-[24px] border border-line bg-surface p-2 md:p-2.5",
         floating && "shadow-[0_14px_40px_rgba(0,0,0,0.06)]",
         className
       )}
@@ -437,6 +437,7 @@ export function BarSelect({
       ref={containerRef}
       className={cn(
         "relative flex flex-col justify-center px-3.5 py-1.5 min-h-[54px]",
+        open && "z-[70]",
         wrapperClassName
       )}
     >
@@ -508,7 +509,7 @@ export function BarSelect({
           data-lenis-prevent
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           className={cn(
-            "no-scrollbar absolute left-1.5 right-1.5 z-50 min-w-[200px] max-h-[280px] overflow-y-auto rounded-[18px] border border-line bg-surface p-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.16)]",
+            "no-scrollbar absolute left-0 right-0 z-[80] min-w-[210px] max-h-[290px] overflow-y-auto rounded-[18px] border border-line bg-surface p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.18)]",
             openUpward ? "bottom-full mb-2" : "top-full mt-2"
           )}
         >

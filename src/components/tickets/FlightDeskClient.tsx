@@ -262,22 +262,25 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
     <div className="space-y-5">
       {/* Top Editorial Bento Showcase: 8-Col Hero + Search & 4-Col Destination Spotlight */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-        {/* Left 8 Cols: Flight Desk Hero with Embedded Search Bar */}
-        <div className="lg:col-span-8 relative min-h-[420px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
-          <Image
-            src="/images/services/flight-window.jpg"
-            alt="View above the clouds from an aircraft cabin window"
-            fill
-            priority
-            sizes="(min-width: 1024px) 66vw, 96vw"
-            placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
-            className="object-cover object-center"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/38 to-black/25"
-          />
+        {/* Left 8 Cols: Flight Desk Hero with Embedded Search Bar (overflow-visible so BarSelect dropdown never clips) */}
+        <div className="lg:col-span-8 relative min-h-[440px] rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
+          {/* Clipped background photo container */}
+          <div className="absolute inset-0 z-0 rounded-[24px] overflow-hidden pointer-events-none">
+            <Image
+              src="/images/services/flight-window.jpg"
+              alt="View above the clouds from an aircraft cabin window"
+              fill
+              priority
+              sizes="(min-width: 1024px) 66vw, 96vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+              className="object-cover object-center"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/38 to-black/25"
+            />
+          </div>
 
           {/* Top Service Desk Switcher + Trip Type Toggle */}
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">

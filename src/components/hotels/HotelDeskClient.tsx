@@ -18,7 +18,6 @@ import type { Hotel } from "@/lib/types";
 import { hotelSearchSchema } from "@/lib/validators";
 import { formatUsd, BLUR_DATA_URL, cn } from "@/lib/utils";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import {
   SearchBarShell,
@@ -164,22 +163,25 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
     <div className="space-y-5">
       {/* Top Editorial Bento Showcase: 8-Col Hero + Search & 4-Col Featured Sanctuary Card */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-        {/* Left 8 Cols: Main Sanctuary Hero with Embedded Search Bar */}
-        <div className="lg:col-span-8 relative min-h-[420px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
-          <Image
-            src="/images/services/hotel-sanctuary.jpg"
-            alt="Sunlit luxury resort suite terrace overlooking the sea"
-            fill
-            priority
-            sizes="(min-width: 1024px) 66vw, 96vw"
-            placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
-            className="object-cover object-center"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25"
-          />
+        {/* Left 8 Cols: Main Sanctuary Hero with Embedded Search Bar (overflow-visible so BarSelect dropdown never clips) */}
+        <div className="lg:col-span-8 relative min-h-[440px] rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
+          {/* Clipped background photo container */}
+          <div className="absolute inset-0 z-0 rounded-[24px] overflow-hidden pointer-events-none">
+            <Image
+              src="/images/services/hotel-sanctuary.jpg"
+              alt="Sunlit luxury resort suite terrace overlooking the sea"
+              fill
+              priority
+              sizes="(min-width: 1024px) 66vw, 96vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+              className="object-cover object-center"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25"
+            />
+          </div>
 
           {/* Top Service Desk Switcher */}
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
@@ -428,7 +430,7 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
         </div>
       </div>
 
-      {/* Editorial Hotel Image Cards (4:3 Photo-First, Clean Whitespace, Zero Nested Box Clutter) */}
+      {/* Editorial Hotel Image Cards — Clean, Minimal, Architectural Presentation */}
       {isLoading ? (
         <CardSkeleton count={6} />
       ) : filteredHotels.length === 0 ? (
@@ -443,23 +445,21 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
       ) : (
         <div
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
           {filteredHotels.map((hotel) => {
             const isBooked = bookedHotelId === hotel.id;
             const totalStayUsd = hotel.pricePerNight * stayNights;
 
             return (
-              <Card
+              <div
                 key={hotel.id}
                 data-hotel-card
-                interactive
-                padding="inset"
-                className="group flex flex-col justify-between overflow-hidden rounded-[22px]"
+                className="group flex flex-col justify-between overflow-hidden rounded-[22px] border border-line bg-surface transition-all duration-300 hover:border-ink/40 hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(0,0,0,0.06)]"
               >
                 <div>
-                  {/* Lush 4:3 Property Photography */}
-                  <div className="relative aspect-[4/3] w-full rounded-[16px] overflow-hidden bg-surface-2">
+                  {/* Full-bleed 16:10 Property Photography */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-2">
                     <Image
                       src={hotel.image}
                       alt={`${hotel.name} in ${hotel.city}`}
@@ -467,53 +467,61 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
                       sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 95vw"
                       placeholder="blur"
                       blurDataURL={BLUR_DATA_URL}
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
                     />
                     <div
                       aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/15"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25"
                     />
 
-                    {/* Top Floating Glass Pills (max 2) */}
+                    {/* Top Floating Glass Badges */}
                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-surface/92 backdrop-blur-md px-3 py-1 text-[11.5px] font-medium text-ink">
-                        <MapPin className="h-3 w-3 text-ink-muted shrink-0" strokeWidth={1.7} aria-hidden="true" />
-                        {hotel.city} · {hotel.neighborhood}
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface/92 backdrop-blur-md px-3 py-1 text-xs font-medium text-ink shadow-2xs">
+                        <MapPin className="h-3 w-3 text-ink-muted shrink-0" strokeWidth={1.8} aria-hidden="true" />
+                        {hotel.city}
                       </span>
                       <span
                         aria-label={`${hotel.stars} stars, rated ${hotel.rating}`}
-                        className="inline-flex items-center gap-1 rounded-full bg-ink/85 backdrop-blur-md px-2.5 py-1 font-mono text-[11px] font-medium text-white"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-ink/85 backdrop-blur-md px-2.5 py-1 font-mono text-xs font-medium text-white shadow-2xs"
                       >
-                        <Star className="h-3 w-3 fill-current" aria-hidden="true" />
-                        {hotel.stars}★ · {hotel.rating.toFixed(1)}
+                        <Star className="h-3 w-3 fill-amber-300 text-amber-300" aria-hidden="true" />
+                        {hotel.rating.toFixed(1)}
+                        <span className="text-white/60 font-sans text-[11px]">({hotel.reviews})</span>
                       </span>
                     </div>
 
                     {hotel.badge ? (
                       <div className="absolute bottom-3 left-3">
-                        <span className="rounded-full bg-black/60 backdrop-blur-md border border-white/20 px-2.5 py-1 text-[11px] font-medium text-white">
+                        <span className="rounded-full bg-black/65 backdrop-blur-md border border-white/20 px-2.5 py-0.5 text-[11px] font-medium text-white">
                           {hotel.badge}
                         </span>
                       </div>
                     ) : null}
                   </div>
 
-                  {/* Clean Editorial Typography & Amenity Pills */}
-                  <div className="px-3 pt-3.5 pb-2 space-y-2.5">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <h2 className="text-[18px] font-medium tracking-[-0.02em] text-ink">
+                  {/* Clean Editorial Content */}
+                  <div className="p-4 sm:p-5 space-y-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-medium text-ink-muted">
+                          {hotel.stars}-Star Luxury Sanctuary
+                        </span>
+                        <span className="text-ink-muted/40">•</span>
+                        <span className="text-[11px] text-ink-muted">
+                          {hotel.neighborhood}
+                        </span>
+                      </div>
+                      <h2 className="text-[19px] font-medium tracking-[-0.02em] text-ink mt-0.5 leading-snug">
                         {hotel.name}
                       </h2>
-                      <span className="text-[11px] text-ink-muted shrink-0">
-                        {hotel.reviews} reviews
-                      </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {hotel.amenities.map((amenity) => (
+                    {/* Curated Amenity Pills */}
+                    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                      {hotel.amenities.slice(0, 3).map((amenity) => (
                         <span
                           key={amenity}
-                          className="rounded-full bg-bg px-2.5 py-1 text-[11px] font-medium text-ink-muted"
+                          className="rounded-full bg-bg px-2.5 py-1 text-[11.5px] font-medium text-ink-muted border border-line/60"
                         >
                           {amenity}
                         </span>
@@ -522,16 +530,16 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
                   </div>
                 </div>
 
-                {/* Clean Hairline Footer */}
-                <div className="mx-3 pb-2.5 pt-3 mt-1 border-t border-line flex items-center justify-between gap-3">
+                {/* Bottom Hairline Rate & Booking Action */}
+                <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-3 border-t border-line flex items-center justify-between gap-3">
                   <div>
                     <div className="flex items-baseline gap-1">
-                      <span className="font-mono text-lg font-medium text-ink">
+                      <span className="font-mono text-xl font-semibold text-ink">
                         {formatUsd(hotel.pricePerNight)}
                       </span>
                       <span className="text-xs text-ink-muted">/ night</span>
                     </div>
-                    <p className="text-[11px] text-ink-muted">
+                    <p className="text-[11px] text-ink-muted mt-0.5 font-mono">
                       {formatUsd(totalStayUsd)} total · {stayNights}{" "}
                       {stayNights === 1 ? "night" : "nights"}
                     </p>
@@ -549,11 +557,11 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
                         Requested
                       </span>
                     ) : (
-                      "Book"
+                      "Book Stay"
                     )}
                   </Button>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>

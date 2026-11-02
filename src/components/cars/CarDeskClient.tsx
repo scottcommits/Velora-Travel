@@ -20,7 +20,6 @@ import { carCategories } from "@/data/cars";
 import { popularAirports } from "@/data/flights";
 import { formatUsd, BLUR_DATA_URL } from "@/lib/utils";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import {
   SearchBarShell,
@@ -134,22 +133,25 @@ export function CarDeskClient({ initialCars }: { initialCars: Car[] }) {
     <div className="space-y-5">
       {/* Top Showroom Bento Showcase: 8-Col Hero + Search & 4-Col Flagship Tourer Spotlight */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-        {/* Left 8 Cols: Grand Touring Hero with Embedded Search Bar */}
-        <div className="lg:col-span-8 relative min-h-[420px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
-          <Image
-            src="/images/services/car-touring.jpg"
-            alt="Grand touring car driving along a scenic coastal highway"
-            fill
-            priority
-            sizes="(min-width: 1024px) 66vw, 96vw"
-            placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
-            className="object-cover object-center"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25"
-          />
+        {/* Left 8 Cols: Grand Touring Hero with Embedded Search Bar (overflow-visible so BarSelect dropdown never clips) */}
+        <div className="lg:col-span-8 relative min-h-[440px] rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
+          {/* Clipped background photo container */}
+          <div className="absolute inset-0 z-0 rounded-[24px] overflow-hidden pointer-events-none">
+            <Image
+              src="/images/services/car-touring.jpg"
+              alt="Grand touring car driving along a scenic coastal highway"
+              fill
+              priority
+              sizes="(min-width: 1024px) 66vw, 96vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+              className="object-cover object-center"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25"
+            />
+          </div>
 
           {/* Top Service Desk Switcher */}
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
@@ -391,7 +393,7 @@ export function CarDeskClient({ initialCars }: { initialCars: Car[] }) {
         </div>
       </div>
 
-      {/* Showroom Fleet Grid (3:2 Photo-First, Clean Spec Pills, Hairline Footer) */}
+      {/* Showroom Fleet Grid — Clean, Minimal, High-Precision Vehicle Cards */}
       {filteredCars.length === 0 ? (
         <div className="rounded-[22px] border border-line bg-surface py-14 px-6 text-center space-y-3">
           <p className="text-sm text-ink-muted">
@@ -404,23 +406,21 @@ export function CarDeskClient({ initialCars }: { initialCars: Car[] }) {
       ) : (
         <div
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
           {filteredCars.map((car) => {
             const isReserved = reservedCarId === car.id;
             const totalRentalUsd = car.pricePerDay * rentalDays;
 
             return (
-              <Card
+              <div
                 key={car.id}
                 data-car-card
-                interactive
-                padding="inset"
-                className="group flex flex-col justify-between overflow-hidden rounded-[22px]"
+                className="group flex flex-col justify-between overflow-hidden rounded-[22px] border border-line bg-surface transition-all duration-300 hover:border-ink/40 hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(0,0,0,0.06)]"
               >
                 <div>
-                  {/* Lush 3:2 Vehicle Showroom Photo */}
-                  <div className="relative aspect-[3/2] w-full rounded-[16px] overflow-hidden bg-surface-2">
+                  {/* Full-bleed 16:10 Vehicle Showroom Photo */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-2">
                     <Image
                       src={car.image}
                       alt={`${car.name} (${car.category})`}
@@ -428,62 +428,69 @@ export function CarDeskClient({ initialCars }: { initialCars: Car[] }) {
                       sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 95vw"
                       placeholder="blur"
                       blurDataURL={BLUR_DATA_URL}
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
                     />
                     <div
                       aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/15"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25"
                     />
 
-                    {/* Top Floating Glass Pills (max 2) */}
+                    {/* Top Floating Glass Badges */}
                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-                      <span className="rounded-full bg-surface/92 backdrop-blur-md px-3 py-1 text-[11.5px] font-medium text-ink">
-                        {car.category}
+                      <span className="rounded-full bg-surface/92 backdrop-blur-md px-3 py-1 text-xs font-medium text-ink shadow-2xs">
+                        {car.category} Fleet
                       </span>
-                      <span className="rounded-full bg-ink/85 backdrop-blur-md px-2.5 py-1 font-mono text-[11px] font-medium text-white">
+                      <span className="rounded-full bg-ink/85 backdrop-blur-md px-2.5 py-1 font-mono text-xs font-medium text-white shadow-2xs">
                         {car.transmission}
+                      </span>
+                    </div>
+
+                    <div className="absolute bottom-3 left-3">
+                      <span className="rounded-full bg-black/65 backdrop-blur-md border border-white/20 px-2.5 py-0.5 text-[11px] font-medium text-white">
+                        Free Airport Handover
                       </span>
                     </div>
                   </div>
 
-                  {/* Clean Showroom Typography & Inline Spec Pills */}
-                  <div className="px-3 pt-3.5 pb-2 space-y-2.5">
+                  {/* Clean Showroom Typography & Spec Strip */}
+                  <div className="p-4 sm:p-5 space-y-3">
                     <div>
-                      <p className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-muted">
-                        {car.brand} · {pickupCity} Airport
+                      <p className="font-mono text-[10.5px] uppercase tracking-[0.08em] text-ink-muted">
+                        {car.brand} · Airport Handover
                       </p>
-                      <h2 className="text-[18px] font-medium tracking-[-0.02em] text-ink mt-0.5">
+                      <h2 className="text-[19px] font-medium tracking-[-0.02em] text-ink mt-0.5 leading-snug">
                         {car.name}
                       </h2>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-bg px-2.5 py-1 text-[11.5px] font-medium text-ink-muted">
-                        <Users className="h-3.5 w-3.5 text-ink" strokeWidth={1.6} aria-hidden="true" />
+                    {/* Clean Inline Spec Pills */}
+                    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-bg px-2.5 py-1 text-[11.5px] font-medium text-ink-muted border border-line/60">
+                        <Users className="h-3.5 w-3.5 text-ink-muted" strokeWidth={1.8} aria-hidden="true" />
                         {car.seats} seats
                       </span>
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-bg px-2.5 py-1 text-[11.5px] font-medium text-ink-muted">
-                        <Cog className="h-3.5 w-3.5 text-ink" strokeWidth={1.6} aria-hidden="true" />
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-bg px-2.5 py-1 text-[11.5px] font-medium text-ink-muted border border-line/60">
+                        <Cog className="h-3.5 w-3.5 text-ink-muted" strokeWidth={1.8} aria-hidden="true" />
                         {car.transmission}
                       </span>
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-bg px-2.5 py-1 text-[11.5px] font-medium text-ink-muted">
-                        <Briefcase className="h-3.5 w-3.5 text-ink" strokeWidth={1.6} aria-hidden="true" />
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-bg px-2.5 py-1 text-[11.5px] font-medium text-ink-muted border border-line/60">
+                        <Briefcase className="h-3.5 w-3.5 text-ink-muted" strokeWidth={1.8} aria-hidden="true" />
                         {car.luggage} bags
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Clean Hairline Footer */}
-                <div className="mx-3 pb-2.5 pt-3 mt-1 border-t border-line flex items-center justify-between gap-3">
+                {/* Bottom Hairline Rate & Reserve Action */}
+                <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-3 border-t border-line flex items-center justify-between gap-3">
                   <div>
                     <div className="flex items-baseline gap-1">
-                      <span className="font-mono text-lg font-medium text-ink">
+                      <span className="font-mono text-xl font-semibold text-ink">
                         {formatUsd(car.pricePerDay)}
                       </span>
                       <span className="text-xs text-ink-muted">/ day</span>
                     </div>
-                    <p className="text-[11px] text-ink-muted">
+                    <p className="text-[11px] text-ink-muted mt-0.5 font-mono">
                       {formatUsd(totalRentalUsd)} total · {rentalDays}{" "}
                       {rentalDays === 1 ? "day" : "days"}
                     </p>
@@ -505,7 +512,7 @@ export function CarDeskClient({ initialCars }: { initialCars: Car[] }) {
                     )}
                   </Button>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
