@@ -59,30 +59,31 @@ export function HowItWorksSection() {
         />
 
         <div className="mt-5 md:mt-6">
-          <div className="h-px w-full bg-line overflow-hidden mb-3">
-            <div data-step-line className="h-full w-full bg-ink" />
+          {/* Subtle grey horizontal progress line (not black) */}
+          <div className="h-px w-full bg-line/70 overflow-hidden mb-4">
+            <div data-step-line className="h-full w-full bg-ink-muted/35" />
           </div>
 
-          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             {processSteps.map((step) => (
               <li
                 key={step.number}
                 data-reveal
-                className="rounded-[20px] border border-line bg-surface p-3 md:p-4 flex flex-col justify-between gap-2.5"
+                className="rounded-[20px] border border-line bg-surface p-6 md:p-7 min-h-[210px] lg:min-h-[245px] flex flex-col justify-between gap-6"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-medium text-ink-muted">
+                  <span className="font-mono text-sm font-medium text-ink-muted">
                     {step.number}
                   </span>
-                  <span className="rounded-full border border-line bg-bg px-2.5 py-0.5 font-mono text-[11px] text-ink-muted">
+                  <span className="rounded-full border border-line bg-bg px-3 py-1 font-mono text-[11px] text-ink-muted">
                     {step.duration}
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-base font-medium text-ink">
+                  <h3 className="text-lg font-medium tracking-[-0.02em] text-ink">
                     {step.title}
                   </h3>
-                  <p className="mt-1 text-sm text-ink-muted leading-snug">
+                  <p className="mt-2 text-sm text-ink-muted leading-relaxed">
                     {step.description}
                   </p>
                 </div>

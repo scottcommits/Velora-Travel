@@ -51,13 +51,13 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
       href={item.href}
       data-reveal
       className={cn(
-        "group relative flex flex-col justify-between rounded-[20px] border border-line bg-surface p-6 md:p-7 min-h-[260px] lg:min-h-[300px] transition-colors hover:border-ink/40",
-        sitsLower ? "lg:mt-9" : "lg:mb-9"
+        "group relative flex flex-col justify-between rounded-[20px] border border-line bg-surface p-7 md:p-8 min-h-[310px] sm:min-h-[340px] lg:min-h-[380px] transition-colors hover:border-ink/40",
+        sitsLower ? "lg:mt-11" : "lg:mb-11"
       )}
     >
       <div>
         <div className="flex items-start justify-between gap-3">
-          <h3 className="text-[19px] lg:text-[20px] font-medium tracking-[-0.02em] leading-snug text-ink pt-1">
+          <h3 className="text-[20px] lg:text-[22px] font-medium tracking-[-0.02em] leading-snug text-ink pt-1">
             {item.title}
           </h3>
           <span
@@ -69,12 +69,12 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
           </span>
         </div>
 
-        <p className="mt-7 text-[14.5px] text-ink-muted leading-[1.52] max-w-[27ch]">
+        <p className="mt-9 text-[15px] text-ink-muted leading-[1.58] max-w-[27ch]">
           {item.description}
         </p>
       </div>
 
-      <div className="pt-8 flex flex-wrap items-center gap-2">
+      <div className="pt-10 flex flex-wrap items-center gap-2">
         {item.highlights.slice(0, 2).map((tag) => (
           <span
             key={tag}

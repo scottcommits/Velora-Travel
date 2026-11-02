@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { primaryNav } from "@/data/nav";
 import { useScrolled } from "@/hooks/useScrolled";
 import { cn } from "@/lib/utils";
@@ -71,15 +72,18 @@ export function Navbar() {
           aria-label="Primary"
           className="flex h-16 items-center justify-between gap-3"
         >
-          {/* Left Logo Glass Pill */}
+          {/* Left Logo (directly on header, no white div or shape wrapper) */}
           <Link
             href="/"
-            className={cn(
-              glassPill,
-              "inline-flex h-11 items-center gap-2 px-4 text-base font-semibold tracking-[-0.03em] text-ink hover:border-ink/40"
-            )}
+            className="pointer-events-auto inline-flex h-11 items-center gap-2.5 px-1 text-lg font-semibold tracking-[-0.03em] text-ink transition-opacity hover:opacity-80"
           >
-            <Compass className="h-4 w-4 text-ink" strokeWidth={1.75} aria-hidden="true" />
+            <Image
+              src="/velora-logo.png"
+              alt=""
+              width={28}
+              height={28}
+              className="h-6 w-6 object-contain invert dark:invert-0"
+            />
             <span>Velora</span>
           </Link>
 

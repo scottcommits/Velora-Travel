@@ -17,11 +17,11 @@ import { Calendar, ChevronDown, ArrowUpRight, Search, Check } from "lucide-react
 import { cn, formatUsd } from "@/lib/utils";
 
 /* ==========================================================================
-   Form Inputs (Contact form, Modal form) - 48px height, 14px radius, error red
+   Form Inputs (Contact form, Modal form) - Cohesive Velora inset control cells
    ========================================================================== */
 
-const fieldBase =
-  "w-full h-12 rounded-[14px] border border-line bg-surface px-3.5 text-[15px] text-ink placeholder:text-ink-muted/60 transition-colors focus:border-ink focus-visible:outline-2 focus-visible:outline-offset-[2px] focus-visible:outline-accent";
+const fieldCellBase =
+  "group relative flex flex-col justify-center rounded-[16px] border border-line bg-bg/60 px-4 py-2.5 transition-colors hover:border-ink/30 focus-within:border-ink focus-within:bg-surface";
 
 export interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -44,39 +44,49 @@ export function InputField({
   const isDate = type === "date";
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-[13px] font-medium text-ink">
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          id={id}
-          type={type}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={describedBy}
-          className={cn(
-            fieldBase,
-            isDate && "velora-date pr-10",
-            error && "border-error",
-            className
-          )}
-          {...props}
-        />
-        {isDate ? (
-          <Calendar
-            aria-hidden="true"
-            strokeWidth={1.5}
-            className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted"
+    <div className="flex flex-col gap-1">
+      <div
+        className={cn(
+          fieldCellBase,
+          "min-h-[58px]",
+          error && "border-error focus-within:border-error"
+        )}
+      >
+        <label
+          htmlFor={id}
+          className="text-[11px] font-medium text-ink-muted leading-tight select-none cursor-pointer"
+        >
+          {label}
+        </label>
+        <div className="relative flex items-center mt-0.5">
+          <input
+            id={id}
+            type={type}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={describedBy}
+            className={cn(
+              "w-full bg-transparent text-[15px] font-medium text-ink placeholder:text-ink-muted/50 leading-snug focus:outline-none",
+              isDate && "velora-date pr-6 cursor-pointer",
+              className
+            )}
+            {...props}
           />
-        ) : null}
+          {isDate ? (
+            <Calendar
+              aria-hidden="true"
+              strokeWidth={1.6}
+              className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-ink-muted"
+            />
+          ) : null}
+        </div>
       </div>
       {hint && !error ? (
-        <p id={hintId} className="text-xs text-ink-muted">
+        <p id={hintId} className="px-1 text-xs text-ink-muted">
           {hint}
         </p>
       ) : null}
       {error ? (
-        <p id={errorId} role="alert" className="text-xs font-medium text-error">
+        <p id={errorId} role="alert" className="px-1 text-xs font-medium text-error">
           {error}
         </p>
       ) : null}
@@ -96,42 +106,154 @@ export function SelectField({
   error,
   options,
   className,
+  value,
+  defaultValue,
+  onChange,
   ...props
 }: SelectFieldProps) {
   const errorId = error ? `${id}-error` : undefined;
+  const [open, setOpen] = useState(false);
+  const [internalValue, setInternalValue] = useState<string>(() =>
+    String(value ?? defaultValue ?? options[0]?.value ?? "")
+  );
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const currentValue = value !== undefined ? String(value) : internalValue;
+  const selectedOption =
+    options.find((o) => o.value === currentValue) ??
+    options[0] ?? { value: "", label: "" };
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  const handleSelectValue = (nextVal: string) => {
+    setInternalValue(nextVal);
+    if (onChange) {
+      const syntheticEvent = {
+        target: { value: nextVal, id: id ?? "", name: props.name ?? "" },
+        currentTarget: { value: nextVal, id: id ?? "", name: props.name ?? "" },
+      } as unknown as ChangeEvent<HTMLSelectElement>;
+      onChange(syntheticEvent);
+    }
+    setOpen(false);
+  };
+
+  const labelId = id ? `${id}-label` : undefined;
+  const listboxId = id ? `${id}-listbox` : undefined;
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-[13px] font-medium text-ink">
-        {label}
-      </label>
-      <div className="relative">
+    <div className="flex flex-col gap-1" ref={containerRef}>
+      <div
+        className={cn(
+          fieldCellBase,
+          "min-h-[58px]",
+          open && "border-ink bg-surface",
+          error && "border-error focus-within:border-error"
+        )}
+      >
         <select
           id={id}
           aria-invalid={error ? true : undefined}
           aria-describedby={errorId}
-          className={cn(
-            fieldBase,
-            "appearance-none pr-10 cursor-pointer",
-            error && "border-error",
-            className
-          )}
+          value={currentValue}
+          onChange={(e) => {
+            setInternalValue(e.target.value);
+            onChange?.(e);
+          }}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="sr-only pointer-events-none"
           {...props}
         >
           {options.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-surface text-ink">
+            <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
           ))}
         </select>
-        <ChevronDown
-          aria-hidden="true"
-          strokeWidth={1.5}
-          className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted"
-        />
+
+        <span
+          id={labelId}
+          onClick={() => setOpen((prev) => !prev)}
+          className="text-[11px] font-medium text-ink-muted leading-tight select-none cursor-pointer"
+        >
+          {label}
+        </span>
+
+        <button
+          type="button"
+          role="combobox"
+          aria-expanded={open}
+          aria-haspopup="listbox"
+          aria-controls={listboxId}
+          aria-labelledby={labelId}
+          onClick={() => setOpen((prev) => !prev)}
+          className={cn(
+            "mt-0.5 flex w-full items-center justify-between gap-2 bg-transparent text-left text-[15px] font-medium text-ink leading-snug focus:outline-none cursor-pointer",
+            className
+          )}
+        >
+          <span className="truncate">{selectedOption.label}</span>
+          <span
+            aria-hidden="true"
+            className={cn(
+              "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-ink-muted transition-all duration-200 group-hover:border-ink/35 group-hover:text-ink",
+              open && "rotate-180 border-ink bg-ink text-bg"
+            )}
+          >
+            <ChevronDown className="h-3 w-3" strokeWidth={1.8} />
+          </span>
+        </button>
+
+        {open ? (
+          <ul
+            id={listboxId}
+            role="listbox"
+            aria-labelledby={labelId}
+            data-lenis-prevent
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            className="no-scrollbar absolute left-0 right-0 top-full mt-2 z-50 max-h-[260px] overflow-y-auto rounded-[18px] border border-line bg-surface p-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.16)]"
+          >
+            {options.map((opt) => {
+              const isSelected = opt.value === currentValue;
+              return (
+                <li
+                  key={opt.value}
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => handleSelectValue(opt.value)}
+                  className={cn(
+                    "flex items-center justify-between gap-2 rounded-[12px] px-3 py-2 text-[13.5px] font-medium transition-colors cursor-pointer select-none",
+                    isSelected ? "bg-ink text-bg" : "text-ink hover:bg-bg-alt"
+                  )}
+                >
+                  <span className="truncate">{opt.label}</span>
+                  {isSelected ? (
+                    <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden="true" />
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
       </div>
       {error ? (
-        <p id={errorId} role="alert" className="text-xs font-medium text-error">
+        <p id={errorId} role="alert" className="px-1 text-xs font-medium text-error">
           {error}
         </p>
       ) : null}
@@ -153,24 +275,33 @@ export function TextareaField({
 }: TextareaFieldProps) {
   const errorId = error ? `${id}-error` : undefined;
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-[13px] font-medium text-ink">
-        {label}
-      </label>
-      <textarea
-        id={id}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={errorId}
+    <div className="flex flex-col gap-1">
+      <div
         className={cn(
-          fieldBase,
-          "min-h-24 py-3 resize-y",
-          error && "border-error",
-          className
+          fieldCellBase,
+          "py-3",
+          error && "border-error focus-within:border-error"
         )}
-        {...props}
-      />
+      >
+        <label
+          htmlFor={id}
+          className="text-[11px] font-medium text-ink-muted leading-tight select-none cursor-pointer"
+        >
+          {label}
+        </label>
+        <textarea
+          id={id}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={errorId}
+          className={cn(
+            "mt-1 w-full min-h-[88px] bg-transparent text-[15px] font-medium text-ink placeholder:text-ink-muted/50 leading-relaxed resize-y focus:outline-none",
+            className
+          )}
+          {...props}
+        />
+      </div>
       {error ? (
-        <p id={errorId} role="alert" className="text-xs font-medium text-error">
+        <p id={errorId} role="alert" className="px-1 text-xs font-medium text-error">
           {error}
         </p>
       ) : null}

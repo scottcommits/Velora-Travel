@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Compass, Globe, Mail, Share2 } from "lucide-react";
+import { ArrowUpRight, Globe, Mail, Share2 } from "lucide-react";
 import { footerLinks } from "@/data/nav";
 import { newsletterSchema } from "@/lib/validators";
 import { Container } from "@/components/ui/Container";
@@ -185,12 +186,18 @@ export function Footer() {
           <p>Visas · Flights · Hotels · Car Rental</p>
         </div>
 
-        {/* Giant faded wordmark (unclipped letters) */}
+        {/* Giant faded wordmark (unclipped letters, using velora-logo.png without any shape wrapper) */}
         <div
           aria-hidden="true"
-          className="mt-4 py-2 flex items-center justify-center gap-4 select-none pointer-events-none text-ink/[0.07]"
+          className="mt-4 py-2 flex items-center justify-center gap-5 select-none pointer-events-none text-ink/[0.07]"
         >
-          <Compass className="h-[13vw] w-[13vw] max-h-36 max-w-36 shrink-0" strokeWidth={1.2} />
+          <Image
+            src="/velora-logo.png"
+            alt=""
+            width={140}
+            height={140}
+            className="h-[11vw] w-[11vw] max-h-32 max-w-32 shrink-0 object-contain invert dark:invert-0 opacity-[0.07]"
+          />
           <span className="text-[16vw] xl:text-[210px] font-semibold tracking-[-0.05em] leading-[1.04]">
             Velora
           </span>
