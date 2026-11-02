@@ -24,7 +24,15 @@ function getServerSnapshot(): "light" | "dark" {
 
 import { cn } from "@/lib/utils";
 
-export function ThemeToggle({ scrolled = false }: { scrolled?: boolean }) {
+export function ThemeToggle({
+  scrolled = false,
+  className,
+  showLabel = false,
+}: {
+  scrolled?: boolean;
+  className?: string;
+  showLabel?: boolean;
+}) {
   const theme = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerSnapshot);
 
   const toggle = () => {
@@ -41,17 +49,22 @@ export function ThemeToggle({ scrolled = false }: { scrolled?: boolean }) {
       onClick={toggle}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
       className={cn(
-        "pointer-events-auto inline-flex h-11 w-11 items-center justify-center rounded-full border transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 text-ink hover:border-ink cursor-pointer",
+        "pointer-events-auto inline-flex items-center justify-center rounded-full border transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 text-ink hover:border-ink cursor-pointer",
+        !showLabel ? "h-11 w-11" : "h-10 px-3.5 gap-2 text-xs font-medium",
         scrolled
           ? "bg-surface/92 backdrop-blur-xl border-ink/15 shadow-[0_6px_24px_rgba(0,0,0,0.06)]"
-          : "bg-surface/80 backdrop-blur-md border-line"
+          : "bg-surface/80 backdrop-blur-md border-line",
+        className
       )}
     >
       {theme === "dark" ? (
-        <Sun className="h-4 w-4 text-ink" strokeWidth={1.5} aria-hidden="true" />
+        <Sun className="h-4 w-4 text-ink shrink-0" strokeWidth={1.5} aria-hidden="true" />
       ) : (
-        <Moon className="h-4 w-4 text-ink" strokeWidth={1.5} aria-hidden="true" />
+        <Moon className="h-4 w-4 text-ink shrink-0" strokeWidth={1.5} aria-hidden="true" />
       )}
+      {showLabel ? (
+        <span>{theme === "dark" ? "Light theme" : "Dark theme"}</span>
+      ) : null}
     </button>
   );
 }

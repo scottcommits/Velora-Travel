@@ -121,18 +121,20 @@ export function Navbar() {
             </ul>
           </div>
 
-          {/* Right Actions: ThemeToggle glass pill + Solid ink "Plan a trip" pill (zero border) */}
+          {/* Right Actions: Desktop has ThemeToggle + Plan a trip; Mobile ONLY has Menu button */}
           <div className="flex items-center gap-2">
-            <ThemeToggle scrolled={scrolled} />
-            <ButtonLink
-              href="/#contact"
-              variant="primary"
-              size="sm"
-              withArrow
-              className="pointer-events-auto hidden sm:inline-flex min-h-11 border-0 shadow-none"
-            >
-              Plan a trip
-            </ButtonLink>
+            <div className="hidden lg:flex items-center gap-2">
+              <ThemeToggle scrolled={scrolled} />
+              <ButtonLink
+                href="/#contact"
+                variant="primary"
+                size="sm"
+                withArrow
+                className="pointer-events-auto min-h-11 border-0 shadow-none"
+              >
+                Plan a trip
+              </ButtonLink>
+            </div>
             <button
               ref={toggleBtnRef}
               type="button"
@@ -169,9 +171,37 @@ export function Navbar() {
           aria-modal="true"
           aria-label="Mobile navigation"
           data-lenis-prevent
-          className="pointer-events-auto fixed inset-x-0 top-16 bottom-0 z-50 bg-bg border-t border-line lg:hidden overflow-y-auto shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+          className="pointer-events-auto fixed inset-0 z-[100] bg-bg lg:hidden flex flex-col justify-between overflow-y-auto"
         >
-          <Container className="py-8 flex flex-col justify-between min-h-full">
+          {/* Drawer Top Header (Matches navbar height, perfectly aligned, zero top empty space) */}
+          <div className="h-16 px-[clamp(12px,1.4vw,24px)] flex items-center justify-between border-b border-line bg-surface/80 backdrop-blur-md shrink-0">
+            <Link
+              href="/"
+              onClick={() => setOpen(false)}
+              className="inline-flex h-11 items-center gap-2.5 pl-3.5 pr-4 rounded-full border border-line bg-surface text-lg font-semibold tracking-[-0.03em] text-ink"
+            >
+              <Image
+                src="/velora-logo.png"
+                alt=""
+                width={26}
+                height={26}
+                className="h-5 w-5 object-contain invert dark:invert-0"
+              />
+              <span>Velora</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close navigation menu"
+              className="inline-flex h-11 items-center gap-2 px-4 rounded-full border border-line bg-surface text-xs font-medium text-ink cursor-pointer hover:border-ink"
+            >
+              <X className="h-4 w-4" strokeWidth={1.8} />
+              <span>Close</span>
+            </button>
+          </div>
+
+          <div className="flex-1 px-[clamp(12px,1.4vw,24px)] py-6 flex flex-col justify-between overflow-y-auto">
             <ul className="flex flex-col divide-y divide-line">
               {primaryNav.map((item) => {
                 const isActive =
@@ -182,7 +212,7 @@ export function Navbar() {
                       href={item.href}
                       onClick={() => setOpen(false)}
                       className={cn(
-                        "block py-4 text-xl font-medium tracking-[-0.02em] transition-colors",
+                        "block py-3.5 text-xl font-medium tracking-[-0.02em] transition-colors",
                         isActive ? "text-accent" : "text-ink hover:text-ink-muted"
                       )}
                     >
@@ -193,19 +223,25 @@ export function Navbar() {
               })}
             </ul>
 
-            <div data-mobile-link className="pt-6 border-t border-line">
+            {/* Bottom Actions: Dark Theme Toggle + Plan a trip Button */}
+            <div data-mobile-link className="pt-6 mt-6 border-t border-line space-y-3 shrink-0">
+              <div className="flex items-center justify-between p-3 rounded-[18px] border border-line bg-surface">
+                <span className="text-sm font-medium text-ink">Appearance</span>
+                <ThemeToggle showLabel className="border-line bg-bg hover:border-ink/40 shadow-xs" />
+              </div>
+
               <ButtonLink
                 href="/#contact"
                 onClick={() => setOpen(false)}
                 variant="primary"
                 size="lg"
                 withArrow
-                className="w-full"
+                className="w-full justify-between"
               >
                 Plan a trip
               </ButtonLink>
             </div>
-          </Container>
+          </div>
         </div>
       ) : null}
     </header>
