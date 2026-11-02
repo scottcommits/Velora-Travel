@@ -5,15 +5,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { destinations } from "@/data/destinations";
-import { formatUsd, BLUR_DATA_URL, cn } from "@/lib/utils";
+import { formatUsd, BLUR_DATA_URL } from "@/lib/utils";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
 import { useReveal } from "@/hooks/useReveal";
+import { useWebGLImage } from "@/hooks/useWebGLImage";
 import { Container } from "@/components/ui/Container";
 
 export function DestinationsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const featuredRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const featured = destinations[activeIndex] ?? destinations[0];
+  const destWebGLRef = useWebGLImage<HTMLDivElement>(
+    "featured-destination",
+    featured.image,
+    24
+  );
 
   useReveal(sectionRef);
   useGSAP(() => {}, { scope: sectionRef });
@@ -28,13 +36,18 @@ export function DestinationsSection() {
     ) {
       gsap.fromTo(
         featuredRef.current,
-        { autoAlpha: 0.2, scale: 0.985 },
-        { autoAlpha: 1, scale: 1, duration: 0.45, ease: "power2.out" }
+        { autoAlpha: 0.25, scale: 0.985 },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          duration: 0.45,
+          ease: "power2.out",
+          clearProps: "transform",
+        }
       );
     }
   };
 
-  const featured = destinations[activeIndex] ?? destinations[0];
   const leftThumbs = [
     destinations[(activeIndex + 1) % destinations.length],
     destinations[(activeIndex + 2) % destinations.length],
@@ -49,17 +62,17 @@ export function DestinationsSection() {
       id="destinations"
       ref={sectionRef}
       aria-labelledby="destinations-heading"
-      className="py-12 md:py-16 lg:py-20"
+      className="py-8 md:py-12 lg:py-14"
     >
       <Container>
-        {/* Desktop BENTO Layout: Left heading + 2 thumbs | Center featured card | Right controls + 2 thumbs */}
-        <div className="hidden lg:grid lg:grid-cols-12 gap-4 items-stretch">
-          {/* Left Column (3 cols) */}
-          <div className="lg:col-span-3 flex flex-col justify-between gap-4">
-            <div className="pt-2">
+        {/* Desktop BENTO Layout: Left heading + 2 thumbs (23%) | Center featured card (54%) | Right 2 thumbs (23%) */}
+        <div className="hidden lg:grid lg:grid-cols-[23%_1fr_23%] gap-3 items-stretch">
+          {/* Left Column */}
+          <div className="flex flex-col justify-between gap-4">
+            <div className="pt-1">
               <p
                 data-reveal
-                className="text-[13px] font-medium text-ink-muted mb-1.5"
+                className="text-[13px] font-medium text-ink-muted mb-1"
               >
                 Popular destinations
               </p>
@@ -72,7 +85,7 @@ export function DestinationsSection() {
               </h2>
               <p
                 data-reveal
-                className="mt-2.5 text-sm text-ink-muted leading-relaxed"
+                className="mt-2 text-sm text-ink-muted leading-snug"
               >
                 Select any city below to preview stays, visa guidance, and seasonal fares.
               </p>
@@ -96,11 +109,11 @@ export function DestinationsSection() {
                         loading="eager"
                         placeholder="blur"
                         blurDataURL={BLUR_DATA_URL}
-                        sizes="160px"
+                        sizes="180px"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
-                    <div className="mt-2 flex items-center justify-between text-xs">
+                    <div className="mt-1.5 flex items-center justify-between text-xs px-0.5">
                       <span className="font-mono text-ink-muted">
                         0{idx + 1}
                       </span>
@@ -114,29 +127,37 @@ export function DestinationsSection() {
             </div>
           </div>
 
-          {/* Center Featured Card (6 cols) */}
-          <div className="lg:col-span-6" data-reveal>
+          {/* Center Featured Card (~54% width) */}
+          <div className="relative" data-reveal>
             <div
               ref={featuredRef}
-              className="relative aspect-[5/6] w-full rounded-[24px] overflow-hidden border border-line bg-ink flex flex-col justify-between p-6 md:p-8"
+              className="relative aspect-[16/13] xl:aspect-[5/4] w-full rounded-[24px] flex flex-col justify-between p-5 md:p-7"
             >
-              <Image
-                src={featured.image}
-                alt={`${featured.name}, ${featured.country}`}
-                fill
-                loading="eager"
-                placeholder="blur"
-                blurDataURL={BLUR_DATA_URL}
-                sizes="(min-width: 1024px) 660px, 95vw"
-                className="object-cover"
-              />
+              {/* Background Image (z-0, registered for WebGL plane at z-[2]) */}
+              <div
+                ref={destWebGLRef}
+                className="absolute inset-0 z-0 rounded-[24px] overflow-hidden border border-line bg-ink"
+              >
+                <Image
+                  src={featured.image}
+                  alt={`${featured.name}, ${featured.country}`}
+                  fill
+                  loading="eager"
+                  placeholder="blur"
+                  blurDataURL={BLUR_DATA_URL}
+                  sizes="(min-width: 1024px) 54vw, 95vw"
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Scrim overlay (z-[3], above WebGL plane at z-[2]) */}
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-black/30"
+                className="pointer-events-none absolute inset-0 z-[3] rounded-[24px] bg-gradient-to-t from-black/80 via-black/15 to-black/40"
               />
 
-              {/* Top functional tags (max 2 per image) */}
-              <div className="relative z-10 flex items-center justify-between gap-2">
+              {/* Top bar: functional tags left + prev/next arrows & "View all destinations" top-right */}
+              <div className="relative z-[5] flex flex-wrap items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 text-xs font-medium text-white">
                     from {formatUsd(featured.priceFrom)}
@@ -146,17 +167,35 @@ export function DestinationsSection() {
                   </span>
                 </div>
 
-                <Link
-                  href={`/hotels?city=${encodeURIComponent(featured.name)}`}
-                  aria-label={`Explore stays in ${featured.name}`}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#0A0A0A] transition-transform hover:scale-105"
-                >
-                  <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />
-                </Link>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => switchDestination(activeIndex - 1)}
+                    aria-label="Previous destination"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/45 backdrop-blur-md border border-white/25 text-white hover:bg-black/65 transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchDestination(activeIndex + 1)}
+                    aria-label="Next destination"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#0A0A0A] hover:opacity-90 transition-opacity cursor-pointer"
+                  >
+                    <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+                  </button>
+                  <Link
+                    href="/hotels"
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/25 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-black/65 transition-colors"
+                  >
+                    <span>View all destinations</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
+                  </Link>
+                </div>
               </div>
 
               {/* Bottom destination title & tagline */}
-              <div className="relative z-10 text-white space-y-2">
+              <div className="relative z-[5] text-white space-y-1.5">
                 <p className="font-mono text-xs text-white/80">
                   0{activeIndex + 1} / 0{destinations.length} · {featured.duration} ({featured.bestSeason})
                 </p>
@@ -165,50 +204,24 @@ export function DestinationsSection() {
                     <h3 className="text-3xl md:text-4xl font-medium tracking-[-0.03em]">
                       {featured.name}, {featured.country}
                     </h3>
-                    <p className="mt-1.5 text-sm text-white/85 max-w-md">
+                    <p className="mt-1 text-sm text-white/85 max-w-md">
                       {featured.tagline}
                     </p>
                   </div>
+                  <Link
+                    href={`/hotels?city=${encodeURIComponent(featured.name)}`}
+                    aria-label={`Explore stays in ${featured.name}`}
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-[#0A0A0A] transition-transform hover:scale-105"
+                  >
+                    <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />
+                  </Link>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column (3 cols) */}
-          <div className="lg:col-span-3 flex flex-col justify-between gap-4">
-            <div
-              data-reveal
-              className="flex flex-col items-center justify-center flex-1 rounded-[20px] border border-line bg-surface p-6 text-center space-y-4"
-            >
-              <p className="text-xs text-ink-muted">
-                Browse all {destinations.length} curated destinations
-              </p>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => switchDestination(activeIndex - 1)}
-                  aria-label="Previous destination"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink text-bg hover:opacity-88 transition-opacity cursor-pointer"
-                >
-                  <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => switchDestination(activeIndex + 1)}
-                  aria-label="Next destination"
-                  className="inline-flex h-14 w-16 items-center justify-center rounded-full border border-line bg-bg text-ink hover:border-ink transition-colors cursor-pointer"
-                >
-                  <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
-                </button>
-              </div>
-              <Link
-                href="/hotels"
-                className="text-xs font-medium text-ink underline underline-offset-4 hover:text-ink-muted"
-              >
-                View all hotels
-              </Link>
-            </div>
-
+          {/* Right Column: aligned 2 thumbnails at bottom (no empty white card) */}
+          <div className="flex flex-col justify-end">
             <div className="grid grid-cols-2 gap-3" data-reveal>
               {rightThumbs.map((item) => {
                 const idx = destinations.findIndex((d) => d.id === item.id);
@@ -227,11 +240,11 @@ export function DestinationsSection() {
                         loading="eager"
                         placeholder="blur"
                         blurDataURL={BLUR_DATA_URL}
-                        sizes="160px"
+                        sizes="180px"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
-                    <div className="mt-2 flex items-center justify-between text-xs">
+                    <div className="mt-1.5 flex items-center justify-between text-xs px-0.5">
                       <span className="font-mono text-ink-muted">
                         0{idx + 1}
                       </span>
@@ -244,32 +257,6 @@ export function DestinationsSection() {
               })}
             </div>
           </div>
-        </div>
-
-        {/* Desktop quick-select pill bar for all 8 destinations */}
-        <div
-          data-reveal
-          className="hidden lg:flex items-center justify-center gap-1.5 mt-4 flex-wrap"
-        >
-          {destinations.map((dest, idx) => {
-            const isCurrent = idx === activeIndex;
-            return (
-              <button
-                key={dest.id}
-                type="button"
-                onClick={() => switchDestination(idx)}
-                aria-pressed={isCurrent}
-                className={cn(
-                  "h-[34px] rounded-full border px-3.5 text-[13px] font-medium transition-colors cursor-pointer",
-                  isCurrent
-                    ? "bg-ink text-bg border-ink"
-                    : "bg-surface text-ink-muted border-line hover:text-ink"
-                )}
-              >
-                {dest.name}
-              </button>
-            );
-          })}
         </div>
 
         {/* Mobile / Tablet Scroll-Snap Slider */}
@@ -285,13 +272,13 @@ export function DestinationsSection() {
             </div>
             <Link
               href="/hotels"
-              className="text-xs font-medium text-ink underline underline-offset-4 shrink-0"
+              className="inline-flex min-h-11 items-center text-xs font-medium text-ink underline underline-offset-4 shrink-0"
             >
-              View all
+              View all destinations
             </Link>
           </div>
 
-          <div className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory pb-2 no-scrollbar -mx-4 px-4">
+          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 no-scrollbar">
             {destinations.map((dest) => (
               <Link
                 key={dest.id}

@@ -258,7 +258,7 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
                 setToCity(fromCity);
               }}
               aria-label="Swap origin and destination"
-              className="mr-2 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line bg-bg text-ink-muted hover:text-ink hover:border-ink transition-colors cursor-pointer"
+              className="mr-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line bg-bg text-ink-muted hover:text-ink hover:border-ink transition-colors cursor-pointer"
             >
               <ArrowLeftRight className="h-3.5 w-3.5" strokeWidth={1.6} aria-hidden="true" />
             </button>

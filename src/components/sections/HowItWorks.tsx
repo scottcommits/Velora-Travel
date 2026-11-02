@@ -42,7 +42,7 @@ export function HowItWorksSection() {
       id="how-it-works"
       ref={scope}
       aria-labelledby="how-it-works-heading"
-      className="py-12 md:py-16 lg:py-20"
+      className="py-8 md:py-12 lg:py-14"
     >
       <Container>
         <SectionHeading
@@ -52,17 +52,17 @@ export function HowItWorksSection() {
           subtitle="From selecting your dates to receiving your confirmed documents and itinerary."
         />
 
-        <div className="mt-7">
-          <div className="h-px w-full bg-line overflow-hidden mb-4">
+        <div className="mt-5 md:mt-6">
+          <div className="h-px w-full bg-line overflow-hidden mb-3">
             <div data-step-line className="h-full w-full bg-ink" />
           </div>
 
-          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {processSteps.map((step) => (
               <li
                 key={step.number}
                 data-reveal
-                className="rounded-[20px] border border-line bg-surface p-5 flex flex-col justify-between gap-4"
+                className="rounded-[20px] border border-line bg-surface p-3 md:p-4 flex flex-col justify-between gap-2.5"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-medium text-ink-muted">
@@ -76,7 +76,7 @@ export function HowItWorksSection() {
                   <h3 className="text-base font-medium text-ink">
                     {step.title}
                   </h3>
-                  <p className="mt-1.5 text-sm text-ink-muted leading-relaxed">
+                  <p className="mt-1 text-sm text-ink-muted leading-snug">
                     {step.description}
                   </p>
                 </div>

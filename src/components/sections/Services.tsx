@@ -53,29 +53,12 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
       href={item.href}
       data-reveal
       className={cn(
-        "group relative flex flex-col justify-between rounded-[20px] border border-line bg-surface p-4 transition-colors hover:border-ink/40",
-        isOffset && "lg:translate-y-5"
+        "group relative flex flex-col justify-between rounded-[20px] border border-line bg-surface p-2 md:p-2.5 transition-colors hover:border-ink/40",
+        isOffset && "lg:translate-y-7"
       )}
     >
       <div>
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div>
-            <span className="font-mono text-[11px] text-ink-muted block">
-              {item.number} · {item.eyebrow}
-            </span>
-            <h3 className="text-lg font-medium tracking-[-0.02em] text-ink">
-              {item.title}
-            </h3>
-          </div>
-          <span
-            data-service-arrow
-            aria-hidden="true"
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-bg text-ink group-hover:bg-ink group-hover:text-bg group-hover:border-ink transition-colors"
-          >
-            <ArrowUpRight className="h-4 w-4" strokeWidth={1.6} />
-          </span>
-        </div>
-
+        {/* Inset photo at top (8-10px from card edge) */}
         <div className="relative aspect-[16/10] w-full rounded-[14px] overflow-hidden bg-surface-2">
           <Image
             data-service-img
@@ -89,12 +72,33 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
           />
         </div>
 
-        <p className="mt-3.5 text-sm text-ink-muted leading-relaxed">
-          {item.description}
-        </p>
+        {/* Text area px-3 pb-3 with bigger circular arrow button */}
+        <div className="px-3 pt-3 pb-2">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <span className="font-mono text-[11px] text-ink-muted block">
+                {item.number} · {item.eyebrow}
+              </span>
+              <h3 className="text-lg font-medium tracking-[-0.02em] text-ink">
+                {item.title}
+              </h3>
+            </div>
+            <span
+              data-service-arrow
+              aria-hidden="true"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line bg-bg text-ink group-hover:bg-ink group-hover:text-bg group-hover:border-ink transition-colors"
+            >
+              <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />
+            </span>
+          </div>
+
+          <p className="mt-2 text-sm text-ink-muted leading-snug">
+            {item.description}
+          </p>
+        </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-line flex flex-wrap items-center gap-1.5">
+      <div className="px-3 pb-3 pt-1 flex flex-wrap items-center gap-1.5">
         {item.highlights.slice(0, 2).map((tag) => (
           <span
             key={tag}
@@ -117,7 +121,7 @@ export function ServicesSection() {
       id="services"
       ref={sectionRef}
       aria-labelledby="services-heading"
-      className="py-12 md:py-16 lg:py-20"
+      className="py-8 md:py-12 lg:py-14"
     >
       <Container>
         <SectionHeading
@@ -127,7 +131,7 @@ export function ServicesSection() {
           subtitle="Book each service independently or combine them into a single itinerary."
         />
 
-        <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:pb-6">
+        <div className="mt-5 md:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:pb-7">
           {servicesOverview.map((service, idx) => (
             <ServiceItem key={service.id} item={service} index={idx} />
           ))}

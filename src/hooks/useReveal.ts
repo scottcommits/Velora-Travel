@@ -23,6 +23,7 @@ export function useReveal(scope: RefObject<HTMLElement | null>, deps: unknown[] 
               ease: "power3.out",
               stagger: 0.08,
               overwrite: true,
+              clearProps: "transform",
             }),
         });
 

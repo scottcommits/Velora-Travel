@@ -52,14 +52,14 @@ export function ContactSection() {
       id="contact"
       ref={scope}
       aria-labelledby="contact-heading"
-      className="py-12 md:py-16 lg:py-20"
+      className="py-8 md:py-12 lg:py-14"
     >
       <Container>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
           {/* Left column: Large rounded photo with overlaid contact info */}
           <div
             data-reveal
-            className="lg:col-span-5 relative min-h-[360px] rounded-[24px] overflow-hidden border border-line bg-ink p-6 sm:p-8 flex flex-col justify-between text-white"
+            className="lg:col-span-5 relative min-h-[320px] rounded-[24px] overflow-hidden border border-line bg-ink p-5 sm:p-6 flex flex-col justify-between text-white"
           >
             <Image
               src={sectionPhotography.heroSecondary}
@@ -67,7 +67,7 @@ export function ContactSection() {
               fill
               placeholder="blur"
               blurDataURL={BLUR_DATA_URL}
-              sizes="(min-width: 1024px) 520px, 94vw"
+              sizes="(min-width: 1024px) 40vw, 94vw"
               className="object-cover"
             />
             <div
@@ -76,7 +76,7 @@ export function ContactSection() {
             />
 
             <div className="relative z-10">
-              <p className="text-[13px] font-medium text-white/80 mb-1.5">
+              <p className="text-[13px] font-medium text-white/80 mb-1">
                 Direct travel desk
               </p>
               <h2
@@ -85,12 +85,12 @@ export function ContactSection() {
               >
                 Send an enquiry.
               </h2>
-              <p className="mt-2.5 text-sm text-white/85 leading-relaxed max-w-sm">
+              <p className="mt-2 text-sm text-white/85 leading-snug max-w-sm">
                 Share your destination and dates—our specialists will prepare visa checklists, flight options, or hotel rates.
               </p>
             </div>
 
-            <div className="relative z-10 mt-8 rounded-[16px] bg-white/15 backdrop-blur-md border border-white/25 p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="relative z-10 mt-6 rounded-[16px] bg-white/15 backdrop-blur-md border border-white/25 p-3.5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <p className="text-white/75">Email</p>
                 <a
@@ -112,12 +112,12 @@ export function ContactSection() {
           {/* Right column: Compact form inside a white card */}
           <div
             data-reveal
-            className="lg:col-span-7 rounded-[20px] border border-line bg-surface p-6 sm:p-8"
+            className="lg:col-span-7 rounded-[20px] border border-line bg-surface p-4 sm:p-6"
           >
             {submittedData ? (
               <div
                 role="status"
-                className="h-full flex flex-col items-start justify-center space-y-4 py-8"
+                className="h-full flex flex-col items-start justify-center space-y-3 py-6"
               >
                 <h3 className="text-2xl font-medium text-ink">
                   Thank you, {submittedData.name}.
@@ -137,9 +137,9 @@ export function ContactSection() {
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 noValidate
-                className="space-y-4"
+                className="space-y-3.5"
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <InputField
                     id="enquiry-name"
                     label="Full name"
@@ -157,7 +157,7 @@ export function ContactSection() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <InputField
                     id="enquiry-phone"
                     type="tel"

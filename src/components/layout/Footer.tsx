@@ -32,14 +32,14 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t border-line bg-bg pt-12 pb-6 md:pt-16 overflow-hidden">
+    <footer className="border-t border-line bg-bg pt-8 pb-6 md:pt-12 md:pb-8 overflow-hidden">
       <Container>
-        {/* Top Centered "Get In Touch" + Email Pill + Round Social Icons */}
-        <div className="mx-auto max-w-xl text-center space-y-5 pb-12 border-b border-line">
+        {/* Top Centered "Stay in the loop" + Email Pill + Round Social Icons */}
+        <div className="mx-auto max-w-xl text-center space-y-4 pb-8 border-b border-line">
           <h2 className="text-[clamp(1.75rem,3.2vw,2.5rem)] font-medium tracking-[-0.03em] leading-[1.06] text-ink">
-            Get In Touch
+            Stay in the loop
           </h2>
-          <p className="text-sm text-ink-muted leading-relaxed">
+          <p className="text-sm text-ink-muted leading-snug">
             Receive seasonal route updates, visa requirement alerts, and curated hotel openings directly in your inbox.
           </p>
 
@@ -59,7 +59,7 @@ export function Footer() {
               <label htmlFor="footer-newsletter-email" className="sr-only">
                 Email address for newsletter
               </label>
-              <div className="flex items-center rounded-full border border-line bg-surface pl-4 pr-1.5 py-1.5 focus-within:border-ink">
+              <div className="flex items-center rounded-full border border-line bg-surface pl-4 pr-1 py-1 focus-within:border-ink">
                 <input
                   id="footer-newsletter-email"
                   type="email"
@@ -68,13 +68,13 @@ export function Footer() {
                   placeholder="hello@velora.travel"
                   aria-invalid={error ? true : undefined}
                   aria-describedby={error ? "newsletter-error" : undefined}
-                  className="flex-1 min-w-0 bg-transparent text-sm text-ink placeholder:text-ink-muted/60 focus:outline-none"
+                  className="flex-1 min-w-0 bg-transparent text-base sm:text-sm text-ink placeholder:text-ink-muted/60 focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={submitting}
                   aria-label="Subscribe to newsletter"
-                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-bg hover:opacity-88 transition-opacity cursor-pointer disabled:opacity-50"
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-bg hover:opacity-88 transition-opacity cursor-pointer disabled:opacity-50"
                 >
                   <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />
                 </button>
@@ -92,7 +92,7 @@ export function Footer() {
           )}
 
           {/* Round social buttons */}
-          <div className="flex items-center justify-center gap-2.5 pt-1">
+          <div className="flex items-center justify-center gap-2 pt-0.5">
             {[
               { name: "Website", href: "https://velora-travel.vercel.app", Icon: Globe },
               { name: "Email", href: "mailto:hello@velora.travel", Icon: Mail },
@@ -104,7 +104,7 @@ export function Footer() {
                 target={href.startsWith("http") ? "_blank" : undefined}
                 rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
                 aria-label={`Velora ${name}`}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface text-ink-muted hover:text-ink hover:border-ink transition-colors"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-ink-muted hover:text-ink hover:border-ink transition-colors"
               >
                 <Icon className="h-4 w-4" strokeWidth={1.6} />
               </a>
@@ -113,7 +113,7 @@ export function Footer() {
         </div>
 
         {/* Compact Link Columns */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-10 border-b border-line text-sm">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-7 border-b border-line text-sm">
           <div>
             <h3 className="text-xs font-medium text-ink-muted mb-3">
               Services
@@ -185,13 +185,13 @@ export function Footer() {
           <p>Visas · Flights · Hotels · Car Rental</p>
         </div>
 
-        {/* Giant faded wordmark */}
+        {/* Giant faded wordmark (unclipped letters) */}
         <div
           aria-hidden="true"
-          className="mt-6 flex items-center justify-center gap-4 select-none pointer-events-none text-ink/[0.07]"
+          className="mt-4 py-2 flex items-center justify-center gap-4 select-none pointer-events-none text-ink/[0.07]"
         >
-          <Compass className="h-[14vw] w-[14vw] max-h-36 max-w-36 shrink-0" strokeWidth={1.2} />
-          <span className="text-[18vw] lg:text-[220px] font-semibold tracking-[-0.05em] leading-[0.82]">
+          <Compass className="h-[13vw] w-[13vw] max-h-36 max-w-36 shrink-0" strokeWidth={1.2} />
+          <span className="text-[16vw] xl:text-[210px] font-semibold tracking-[-0.05em] leading-[1.04]">
             Velora
           </span>
         </div>

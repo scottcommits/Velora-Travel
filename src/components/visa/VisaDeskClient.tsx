@@ -276,18 +276,18 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
       ) : (
         <div
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
         >
           {filteredOffers.map((offer) => (
             <Card
               key={offer.id}
               data-visa-card
               interactive
-              padding="none"
+              padding="inset"
               className="group flex flex-col justify-between overflow-hidden"
             >
               <div>
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2">
+                <div className="relative aspect-[4/3] w-full rounded-[14px] overflow-hidden bg-surface-2">
                   <Image
                     src={offer.image}
                     alt={`${offer.country} ${offer.visaType} visa`}
@@ -295,9 +295,9 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
                     sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 95vw"
                     placeholder="blur"
                     blurDataURL={BLUR_DATA_URL}
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
-                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+                  <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-2">
                     <span className="inline-flex items-center rounded-full bg-surface/92 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-ink">
                       {offer.region}
                     </span>
@@ -307,7 +307,7 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-5 space-y-2">
+                <div className="px-3 pt-3 pb-2 space-y-1.5">
                   <h2 className="text-[17px] font-medium tracking-[-0.015em] text-ink">
                     {offer.country}
                   </h2>
@@ -325,7 +325,7 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
                 </div>
               </div>
 
-              <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-3 border-t border-line flex items-center justify-between gap-3">
+              <div className="px-3 pb-3 pt-2 flex items-center justify-between gap-3">
                 <div>
                   <span className="font-mono text-base font-medium text-ink">
                     {formatUsd(offer.priceUsd)}

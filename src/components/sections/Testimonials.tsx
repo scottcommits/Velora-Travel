@@ -26,7 +26,13 @@ export function TestimonialsSection() {
       gsap.fromTo(
         slideRef.current,
         { autoAlpha: 0, y: 10 },
-        { autoAlpha: 1, y: 0, duration: 0.35, ease: "power2.out" }
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.35,
+          ease: "power2.out",
+          clearProps: "transform",
+        }
       );
     }
   };
@@ -49,15 +55,15 @@ export function TestimonialsSection() {
       ref={scope}
       aria-labelledby="testimonials-heading"
       aria-roledescription="carousel"
-      className="py-12 md:py-16 lg:py-20"
+      className="py-8 md:py-12 lg:py-14"
     >
       <Container>
-        {/* Header with round arrows */}
-        <div className="flex items-end justify-between gap-4 mb-6">
+        {/* Header with round arrows top-right */}
+        <div className="flex items-end justify-between gap-4 mb-5 md:mb-6">
           <div>
             <p
               data-reveal
-              className="text-[13px] font-medium text-ink-muted mb-1.5"
+              className="text-[13px] font-medium text-ink-muted mb-1"
             >
               Client stories
             </p>
@@ -90,25 +96,25 @@ export function TestimonialsSection() {
           </div>
         </div>
 
-        {/* 3-Column Bento Layout: Photo Left | Quote Center | Peeking Next Photo Right */}
+        {/* 3-Column Bento Layout: Left Photo | Lighter Vertically-Centered Quote | Right Peeking Photo — all sharing one row height */}
         <div
           ref={slideRef}
           role="group"
           aria-roledescription="slide"
           aria-label={`Testimonial ${index + 1} of ${testimonials.length}`}
           aria-live="polite"
-          className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch lg:min-h-[340px]"
         >
           {/* Left Photo */}
-          <div className="lg:col-span-4" data-reveal>
-            <div className="relative aspect-[4/3] lg:aspect-[5/5] w-full rounded-[24px] overflow-hidden border border-line bg-ink p-4 flex items-end">
+          <div className="lg:col-span-4 flex" data-reveal>
+            <div className="relative min-h-[260px] lg:min-h-full w-full rounded-[24px] overflow-hidden border border-line bg-ink p-4 flex items-end">
               <Image
                 src={current.tripImage}
                 alt={`${current.route} journey`}
                 fill
                 placeholder="blur"
                 blurDataURL={BLUR_DATA_URL}
-                sizes="(min-width: 1024px) 420px, 94vw"
+                sizes="(min-width: 1024px) 32vw, 94vw"
                 className="object-cover"
               />
               <div
@@ -130,42 +136,41 @@ export function TestimonialsSection() {
             </div>
           </div>
 
-          {/* Center Quote Card */}
-          <div className="lg:col-span-6" data-reveal>
-            <div className="rounded-[20px] border border-line bg-surface p-6 sm:p-8 lg:p-10 flex flex-col justify-between min-h-[260px] lg:min-h-[340px]">
+          {/* Center Lighter Quote Container (vertically centered, shared row height) */}
+          <div className="lg:col-span-6 flex" data-reveal>
+            <div className="w-full rounded-[24px] border border-line/70 bg-surface/65 p-5 sm:p-7 lg:px-9 lg:py-7 flex flex-col justify-center gap-4">
               <span
                 aria-hidden="true"
-                className="font-serif text-4xl leading-none text-ink-muted/40 select-none"
+                className="font-serif text-4xl leading-none text-ink-muted/35 select-none"
               >
                 “
               </span>
 
-              <blockquote className="my-4 text-[clamp(1.25rem,2.3vw,1.85rem)] font-medium tracking-[-0.02em] leading-[1.3] text-ink">
+              <blockquote className="text-[clamp(1.2rem,2.1vw,1.75rem)] font-medium tracking-[-0.02em] leading-[1.32] text-ink">
                 {current.quote}
               </blockquote>
 
-              <div className="pt-4 border-t border-line flex items-center justify-between gap-4 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="relative h-9 w-9 rounded-full overflow-hidden border border-line bg-surface-2">
+              <div className="pt-2 flex items-center justify-between gap-4 text-xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="relative h-8 w-8 rounded-full overflow-hidden border border-line bg-surface-2">
                     <Image
                       src={current.avatar}
                       alt={current.author}
                       fill
-                      sizes="36px"
+                      sizes="32px"
                       className="object-cover"
                     />
                   </div>
-                  <div>
-                    <p className="font-medium text-ink text-sm">
-                      {current.author}
-                    </p>
-                    <p className="text-ink-muted">
-                      {current.role} · {current.service} ({current.route})
-                    </p>
-                  </div>
+                  <p className="text-ink-muted">
+                    <strong className="font-medium text-ink">
+                      — {current.author}
+                    </strong>{" "}
+                    <span className="mx-1 text-ink-muted/50">|</span>{" "}
+                    {current.role} · {current.service} ({current.route})
+                  </p>
                 </div>
 
-                <span className="font-mono text-xs text-ink-muted">
+                <span className="font-mono text-xs text-ink-muted shrink-0">
                   <strong className="text-ink font-medium">{index + 1}</strong>/
                   {testimonials.length}
                 </span>
@@ -173,13 +178,13 @@ export function TestimonialsSection() {
             </div>
           </div>
 
-          {/* Right Peeking Photo (Desktop) */}
-          <div className="hidden lg:block lg:col-span-2" data-reveal>
+          {/* Right Peeking Photo (Desktop — stretches to match exact row height) */}
+          <div className="hidden lg:flex lg:col-span-2" data-reveal>
             <button
               type="button"
               onClick={next}
               aria-label={`Next review by ${nextItem.author}`}
-              className="group relative aspect-[3/4] w-full rounded-[20px] overflow-hidden border border-line bg-ink p-3 flex items-end text-left cursor-pointer"
+              className="group relative h-full w-full rounded-[24px] overflow-hidden border border-line bg-ink p-3.5 flex items-end text-left cursor-pointer"
             >
               <Image
                 src={nextItem.tripImage}
@@ -188,7 +193,7 @@ export function TestimonialsSection() {
                 loading="eager"
                 placeholder="blur"
                 blurDataURL={BLUR_DATA_URL}
-                sizes="220px"
+                sizes="18vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div
