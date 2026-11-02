@@ -1,16 +1,14 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { servicesOverview } from "@/data/stats";
 import type { ServiceSummary } from "@/lib/types";
-import { BLUR_DATA_URL, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { gsap, useGSAP, MOTION_OK, HOVER_FINE } from "@/lib/gsap";
 import { useReveal } from "@/hooks/useReveal";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
 
 function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
   const itemRef = useRef<HTMLAnchorElement>(null);
@@ -21,16 +19,15 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
       mm.add(`${HOVER_FINE} and ${MOTION_OK}`, () => {
         const el = itemRef.current;
         if (!el || !contextSafe) return;
-        const img = el.querySelector("[data-service-img]");
         const arrow = el.querySelector("[data-service-arrow]");
 
         const enter = contextSafe(() => {
-          if (img) gsap.to(img, { scale: 1.05, duration: 0.45, ease: "power2.out" });
-          if (arrow) gsap.to(arrow, { rotate: 45, duration: 0.3, ease: "power2.out" });
+          gsap.to(el, { y: -4, duration: 0.3, ease: "power2.out" });
+          if (arrow) gsap.to(arrow, { rotate: -35, duration: 0.3, ease: "power2.out" });
         });
 
         const leave = contextSafe(() => {
-          if (img) gsap.to(img, { scale: 1, duration: 0.45, ease: "power2.out" });
+          gsap.to(el, { y: 0, duration: 0.35, ease: "power2.out" });
           if (arrow) gsap.to(arrow, { rotate: 0, duration: 0.3, ease: "power2.out" });
         });
 
@@ -45,7 +42,8 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
     { scope: itemRef }
   );
 
-  const isOffset = index % 2 === 1;
+  // Desktop stagger matching the reference: card 1 sits lower, card 2 sits higher, card 3 sits lower, card 4 sits higher
+  const sitsLower = index % 2 === 0;
 
   return (
     <Link
@@ -53,56 +51,34 @@ function ServiceItem({ item, index }: { item: ServiceSummary; index: number }) {
       href={item.href}
       data-reveal
       className={cn(
-        "group relative flex flex-col justify-between rounded-[20px] border border-line bg-surface p-1.5 md:p-2 transition-colors hover:border-ink/40",
-        isOffset ? "lg:mt-7" : "lg:mb-7"
+        "group relative flex flex-col justify-between rounded-[20px] border border-line bg-surface p-6 md:p-7 min-h-[260px] lg:min-h-[300px] transition-colors hover:border-ink/40",
+        sitsLower ? "lg:mt-9" : "lg:mb-9"
       )}
     >
       <div>
-        {/* Tight inset photo at top (6-8px from card edge) */}
-        <div className="relative aspect-[16/10] w-full rounded-[15px] overflow-hidden bg-surface-2">
-          <Image
-            data-service-img
-            src={item.image}
-            alt={`${item.title} — ${item.description}`}
-            fill
-            placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
-            sizes="(min-width: 1024px) 24vw, (min-width: 640px) 48vw, 94vw"
-            className="object-cover"
-          />
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-[19px] lg:text-[20px] font-medium tracking-[-0.02em] leading-snug text-ink pt-1">
+            {item.title}
+          </h3>
+          <span
+            data-service-arrow
+            aria-hidden="true"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-ink/75 bg-transparent text-ink group-hover:bg-ink group-hover:text-bg group-hover:border-ink transition-colors"
+          >
+            <ArrowRight className="h-4 w-4" strokeWidth={1.6} />
+          </span>
         </div>
 
-        {/* Compact text area with circular arrow button */}
-        <div className="px-2.5 pt-2.5 pb-1.5">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <span className="font-mono text-[11px] text-ink-muted block">
-                {item.number} · {item.eyebrow}
-              </span>
-              <h3 className="text-lg font-medium tracking-[-0.02em] text-ink">
-                {item.title}
-              </h3>
-            </div>
-            <span
-              data-service-arrow
-              aria-hidden="true"
-              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line bg-bg text-ink group-hover:bg-ink group-hover:text-bg group-hover:border-ink transition-colors"
-            >
-              <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />
-            </span>
-          </div>
-
-          <p className="mt-1.5 text-sm text-ink-muted leading-snug">
-            {item.description}
-          </p>
-        </div>
+        <p className="mt-7 text-[14.5px] text-ink-muted leading-[1.52] max-w-[27ch]">
+          {item.description}
+        </p>
       </div>
 
-      <div className="px-2.5 pb-2 pt-1 flex flex-wrap items-center gap-1.5">
+      <div className="pt-8 flex flex-wrap items-center gap-2">
         {item.highlights.slice(0, 2).map((tag) => (
           <span
             key={tag}
-            className="inline-flex items-center rounded-full border border-line bg-bg px-2.5 py-0.5 text-[11px] font-medium text-ink-muted"
+            className="inline-flex items-center rounded-full border border-line bg-surface px-3.5 py-1 text-xs font-medium text-ink-muted"
           >
             {tag}
           </span>
@@ -124,14 +100,17 @@ export function ServicesSection() {
       className="py-8 md:py-12 lg:py-14"
     >
       <Container>
-        <SectionHeading
-          id="services-heading"
-          eyebrow="What we offer"
-          title="Four core travel services."
-          subtitle="Book each service independently or combine them into a single itinerary."
-        />
+        <div className="mb-6 md:mb-8">
+          <h2
+            id="services-heading"
+            data-reveal
+            className="text-[clamp(1.75rem,3.2vw,2.75rem)] font-medium tracking-[-0.03em] leading-[1.06] text-ink"
+          >
+            What We Offer
+          </h2>
+        </div>
 
-        <div className="mt-5 md:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3.5 items-start">
           {servicesOverview.map((service, idx) => (
             <ServiceItem key={service.id} item={service} index={idx} />
           ))}

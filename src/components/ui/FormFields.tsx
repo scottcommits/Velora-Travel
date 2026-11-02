@@ -375,8 +375,9 @@ export function BarSelect({
           role="listbox"
           aria-labelledby={labelId}
           data-lenis-prevent
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           className={cn(
-            "absolute left-1.5 right-1.5 z-50 min-w-[200px] max-h-60 overflow-y-auto rounded-[18px] border border-line bg-surface p-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.16)]",
+            "no-scrollbar absolute left-1.5 right-1.5 z-50 min-w-[200px] max-h-[280px] overflow-y-auto rounded-[18px] border border-line bg-surface p-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.16)]",
             openUpward ? "bottom-full mb-2" : "top-full mt-2"
           )}
         >

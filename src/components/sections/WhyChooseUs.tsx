@@ -103,34 +103,34 @@ export function WhyChooseUsSection() {
               </div>
             </div>
 
-            {/* Overlapping white image card (z-[5] so it layers cleanly above WebGL plane) */}
+            {/* Overlapping white image card with tight 7-8px inset and 6-8px thumbnail-to-text gap */}
             <Link
               href="/hotels"
               data-reveal
-              className="group relative sm:absolute -mt-14 sm:mt-0 ml-auto sm:right-0 sm:top-1/2 sm:-translate-y-1/2 z-[5] block w-[80%] sm:w-[240px] rounded-[20px] border border-line bg-surface p-2.5 transition-transform duration-300 hover:-translate-y-[calc(50%+3px)]"
+              className="group relative sm:absolute -mt-14 sm:mt-0 ml-auto sm:right-0 sm:top-1/2 sm:-translate-y-1/2 z-[5] block w-[78%] sm:w-[236px] rounded-[18px] border border-line bg-surface p-[7px] sm:p-2 transition-transform duration-300 hover:-translate-y-[calc(50%+3px)]"
             >
-              <div className="relative aspect-[4/3] w-full rounded-[14px] overflow-hidden bg-surface-2">
+              <div className="relative aspect-[4/3] w-full rounded-[12px] overflow-hidden bg-surface-2">
                 <Image
                   src={sectionPhotography.aboutOverlap}
                   alt="Green island cove surrounded by calm clear water"
                   fill
                   placeholder="blur"
                   blurDataURL={BLUR_DATA_URL}
-                  sizes="240px"
+                  sizes="236px"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <span
                   aria-hidden="true"
-                  className="absolute top-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-surface text-ink"
+                  className="absolute top-2 right-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-surface text-ink"
                 >
                   <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} />
                 </span>
               </div>
-              <div className="mt-2.5 px-1.5 pb-1">
-                <h3 className="text-sm font-medium text-ink">
+              <div className="mt-[7px] px-1 pb-0.5">
+                <h3 className="text-[13.5px] font-medium leading-tight text-ink">
                   Tailored Itineraries
                 </h3>
-                <p className="mt-0.5 text-xs text-ink-muted leading-snug">
+                <p className="mt-0.5 text-[11.5px] text-ink-muted leading-snug">
                   Visas, flights, stays, and local cars coordinated in one schedule.
                 </p>
               </div>

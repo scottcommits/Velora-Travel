@@ -1,134 +1,386 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { destinations } from "@/data/destinations";
-import { formatUsd, BLUR_DATA_URL } from "@/lib/utils";
+import { formatUsd, BLUR_DATA_URL, cn } from "@/lib/utils";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
 import { useReveal } from "@/hooks/useReveal";
-import { useWebGLImage } from "@/hooks/useWebGLImage";
 import { Container } from "@/components/ui/Container";
+
+interface SlotBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  mediaHeight: number;
+  radius: number;
+  scale: number;
+  opacity: number;
+  zIndex: number;
+}
+
+function getCircularOffset(index: number, centerIndex: number, length: number): number {
+  const raw = (index - centerIndex + length) % length;
+  if (raw <= Math.floor(length / 2)) return raw;
+  return raw - length;
+}
+
+function computeSlotGeometry(
+  offset: number,
+  trackWidth: number,
+  trackHeight: number
+): SlotBox {
+  const gap = 12;
+  const captionH = 26;
+  const featuredW = Math.round(trackWidth * 0.535);
+  const sideGroupW = Math.floor((trackWidth - featuredW - gap * 2) / 2);
+  const thumbW = Math.max(96, Math.floor((sideGroupW - gap) / 2));
+  const thumbMediaH = Math.min(
+    trackHeight - captionH - 180,
+    Math.round(thumbW * 1.24)
+  );
+  const thumbTotalH = thumbMediaH + captionH;
+  const thumbY = trackHeight - thumbTotalH;
+
+  const leftOuterX = 0;
+  const leftInnerX = thumbW + gap;
+  const featuredX = sideGroupW + gap;
+  const rightInnerX = featuredX + featuredW + gap;
+  const rightOuterX = rightInnerX + thumbW + gap;
+
+  if (offset === 0) {
+    return {
+      x: featuredX,
+      y: 0,
+      width: featuredW,
+      height: trackHeight,
+      mediaHeight: trackHeight,
+      radius: 24,
+      scale: 1,
+      opacity: 1,
+      zIndex: 10,
+    };
+  }
+
+  if (offset === -2) {
+    return {
+      x: leftOuterX,
+      y: thumbY,
+      width: thumbW,
+      height: thumbTotalH,
+      mediaHeight: thumbMediaH,
+      radius: 18,
+      scale: 1,
+      opacity: 1,
+      zIndex: 5,
+    };
+  }
+
+  if (offset === -1) {
+    return {
+      x: leftInnerX,
+      y: thumbY,
+      width: thumbW,
+      height: thumbTotalH,
+      mediaHeight: thumbMediaH,
+      radius: 18,
+      scale: 1,
+      opacity: 1,
+      zIndex: 6,
+    };
+  }
+
+  if (offset === 1) {
+    return {
+      x: rightInnerX,
+      y: thumbY,
+      width: thumbW,
+      height: thumbTotalH,
+      mediaHeight: thumbMediaH,
+      radius: 18,
+      scale: 1,
+      opacity: 1,
+      zIndex: 6,
+    };
+  }
+
+  if (offset === 2) {
+    return {
+      x: rightOuterX,
+      y: thumbY,
+      width: thumbW,
+      height: thumbTotalH,
+      mediaHeight: thumbMediaH,
+      radius: 18,
+      scale: 1,
+      opacity: 1,
+      zIndex: 5,
+    };
+  }
+
+  if (offset < -2) {
+    return {
+      x: leftOuterX - (thumbW + gap) * Math.min(2, Math.abs(offset) - 2),
+      y: thumbY,
+      width: thumbW,
+      height: thumbTotalH,
+      mediaHeight: thumbMediaH,
+      radius: 18,
+      scale: 0.86,
+      opacity: 0,
+      zIndex: 1,
+    };
+  }
+
+  return {
+    x: rightOuterX + (thumbW + gap) * Math.min(2, offset - 2),
+    y: thumbY,
+    width: thumbW,
+    height: thumbTotalH,
+    mediaHeight: thumbMediaH,
+    radius: 18,
+    scale: 0.86,
+    opacity: 0,
+    zIndex: 1,
+  };
+}
 
 export function DestinationsSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const featuredRef = useRef<HTMLDivElement>(null);
-  const imageLayersRef = useRef<(HTMLDivElement | null)[]>([]);
-  const metaRef = useRef<HTMLDivElement>(null);
-  const tagsRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const mediaRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const featuredUiRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const thumbUiRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const activeIndexRef = useRef(0);
+  const isAnimatingRef = useRef(false);
+
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const featured = destinations[activeIndex] ?? destinations[0];
-  const destWebGLRef = useWebGLImage<HTMLDivElement>(
-    "featured-destination",
-    featured.image,
-    24
-  );
-
   useReveal(sectionRef);
-  useGSAP(() => {}, { scope: sectionRef });
+  const { contextSafe } = useGSAP({ scope: sectionRef });
 
-  const switchDestination = (nextIdx: number, explicitDir?: 1 | -1) => {
+  const layoutCards = useCallback((centerIdx: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const W = track.clientWidth;
+    const H = track.clientHeight;
+    if (!W || !H) return;
+
     const len = destinations.length;
-    const normalized = (nextIdx + len) % len;
-    if (normalized === activeIndex) return;
+    destinations.forEach((_, i) => {
+      const card = cardRefs.current[i];
+      const media = mediaRefs.current[i];
+      const featUi = featuredUiRefs.current[i];
+      const thumbUi = thumbUiRefs.current[i];
+      if (!card || !media) return;
 
-    const dir: 1 | -1 =
-      explicitDir ??
-      ((normalized - activeIndex + len) % len <= len / 2 ? 1 : -1);
+      const offset = getCircularOffset(i, centerIdx, len);
+      const box = computeSlotGeometry(offset, W, H);
+      const isCenter = offset === 0;
+      const isVisible = Math.abs(offset) <= 2;
 
-    const prevIdx = activeIndex;
-    setActiveIndex(normalized);
+      gsap.set(card, {
+        x: box.x,
+        y: box.y,
+        width: box.width,
+        height: box.height,
+        scale: box.scale,
+        autoAlpha: isVisible ? 1 : 0,
+        zIndex: box.zIndex,
+      });
 
+      gsap.set(media, {
+        height: box.mediaHeight,
+        borderRadius: box.radius,
+      });
+
+      if (featUi) {
+        gsap.set(featUi, {
+          autoAlpha: isCenter ? 1 : 0,
+          y: 0,
+          pointerEvents: isCenter ? "auto" : "none",
+        });
+      }
+
+      if (thumbUi) {
+        gsap.set(thumbUi, {
+          autoAlpha: !isCenter && isVisible ? 1 : 0,
+        });
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    layoutCards(activeIndexRef.current);
+    const onResize = () => {
+      if (!isAnimatingRef.current) {
+        layoutCards(activeIndexRef.current);
+      }
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [layoutCards]);
+
+  // eslint-disable-next-line react-hooks/refs
+  const slideByOffset = contextSafe((stepOffset: number) => {
+    if (stepOffset === 0) return;
+    const len = destinations.length;
+    const prevCenter = activeIndexRef.current;
+    const nextCenter = (prevCenter + stepOffset + len) % len;
+    activeIndexRef.current = nextCenter;
+    setActiveIndex(nextCenter);
+
+    const track = trackRef.current;
     if (
-      typeof window !== "undefined" &&
-      window.matchMedia(MOTION_OK).matches
+      !track ||
+      typeof window === "undefined" ||
+      !window.matchMedia(MOTION_OK).matches
     ) {
-      const outgoingEl = imageLayersRef.current[prevIdx];
-      const incomingEl = imageLayersRef.current[normalized];
+      layoutCards(nextCenter);
+      return;
+    }
 
-      const tl = gsap.timeline({ defaults: { overwrite: "auto" } });
+    const W = track.clientWidth;
+    const H = track.clientHeight;
+    if (!W || !H) return;
 
-      if (outgoingEl && incomingEl) {
-        gsap.set(outgoingEl, { zIndex: 1 });
-        gsap.set(incomingEl, { zIndex: 2 });
+    isAnimatingRef.current = true;
+    const dir = stepOffset > 0 ? 1 : -1;
 
-        tl.fromTo(
-          outgoingEl,
-          { autoAlpha: 1, scale: 1, xPercent: 0 },
+    const tl = gsap.timeline({
+      defaults: {
+        duration: 0.82,
+        ease: "power3.out",
+        overwrite: "auto",
+      },
+      onComplete: () => {
+        isAnimatingRef.current = false;
+        layoutCards(nextCenter);
+      },
+    });
+
+    destinations.forEach((_, i) => {
+      const card = cardRefs.current[i];
+      const media = mediaRefs.current[i];
+      const featUi = featuredUiRefs.current[i];
+      const thumbUi = thumbUiRefs.current[i];
+      if (!card || !media) return;
+
+      const oldOffset = getCircularOffset(i, prevCenter, len);
+      const newOffset = getCircularOffset(i, nextCenter, len);
+      const wasVisible = Math.abs(oldOffset) <= 2;
+      const willBeVisible = Math.abs(newOffset) <= 2;
+
+      const targetBox = computeSlotGeometry(newOffset, W, H);
+      const isBecomingCenter = newOffset === 0;
+      const wasCenter = oldOffset === 0;
+
+      // If this card is newly entering the 5-card visible window from off-screen,
+      // pre-position it at the incoming off-screen edge on the correct side so it slides in cleanly
+      if (!wasVisible && willBeVisible) {
+        const entryOffset = newOffset + stepOffset;
+        const entryBox = computeSlotGeometry(entryOffset, W, H);
+        gsap.set(card, {
+          x: entryBox.x,
+          y: entryBox.y,
+          width: entryBox.width,
+          height: entryBox.height,
+          scale: 0.88,
+          autoAlpha: 0,
+          zIndex: targetBox.zIndex,
+        });
+        gsap.set(media, {
+          height: entryBox.mediaHeight,
+          borderRadius: entryBox.radius,
+        });
+      } else {
+        gsap.set(card, {
+          zIndex: isBecomingCenter ? 12 : wasCenter ? 9 : targetBox.zIndex,
+        });
+      }
+
+      if (wasVisible && !willBeVisible) {
+        const exitOffset = oldOffset - stepOffset;
+        const exitBox = computeSlotGeometry(exitOffset, W, H);
+        tl.to(
+          card,
           {
+            x: exitBox.x,
+            y: exitBox.y,
+            width: exitBox.width,
+            height: exitBox.height,
+            scale: 0.88,
             autoAlpha: 0,
-            scale: dir > 0 ? 0.94 : 1.07,
-            xPercent: -dir * 6,
-            duration: 0.65,
-            ease: "power3.inOut",
           },
           0
-        ).fromTo(
-          incomingEl,
+        );
+        tl.to(
+          media,
           {
-            autoAlpha: 0,
-            scale: dir > 0 ? 1.1 : 0.93,
-            xPercent: dir * 6,
+            height: exitBox.mediaHeight,
+            borderRadius: exitBox.radius,
           },
+          0
+        );
+      } else if (willBeVisible) {
+        tl.to(
+          card,
           {
-            autoAlpha: 1,
+            x: targetBox.x,
+            y: targetBox.y,
+            width: targetBox.width,
+            height: targetBox.height,
             scale: 1,
-            xPercent: 0,
-            duration: 0.72,
-            ease: "power3.out",
+            autoAlpha: 1,
           },
           0
         );
-      }
-
-      if (tagsRef.current) {
-        tl.fromTo(
-          tagsRef.current,
-          { autoAlpha: 0, y: -8 },
-          { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" },
-          0.08
+        tl.to(
+          media,
+          {
+            height: targetBox.mediaHeight,
+            borderRadius: targetBox.radius,
+          },
+          0
         );
+      } else {
+        gsap.set(card, { autoAlpha: 0 });
       }
 
-      if (metaRef.current) {
-        tl.fromTo(
-          metaRef.current,
-          { autoAlpha: 0, y: dir * 14 },
-          { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" },
-          0.06
-        );
-      }
-
-      if (sectionRef.current) {
-        const thumbs = sectionRef.current.querySelectorAll("[data-dest-thumb]");
-        if (thumbs.length) {
+      if (featUi) {
+        if (isBecomingCenter) {
+          gsap.set(featUi, { pointerEvents: "auto" });
           tl.fromTo(
-            thumbs,
-            { autoAlpha: 0.45, scale: 0.96 },
-            {
-              autoAlpha: 1,
-              scale: 1,
-              duration: 0.48,
-              stagger: 0.04,
-              ease: "power2.out",
-            },
-            0.04
+            featUi,
+            { autoAlpha: 0, y: dir * 14 },
+            { autoAlpha: 1, y: 0, duration: 0.55, ease: "power3.out" },
+            0.22
           );
+        } else if (wasCenter) {
+          gsap.set(featUi, { pointerEvents: "none" });
+          tl.to(
+            featUi,
+            { autoAlpha: 0, y: -dir * 10, duration: 0.32, ease: "power2.in" },
+            0
+          );
+        } else {
+          gsap.set(featUi, { autoAlpha: 0, pointerEvents: "none" });
         }
       }
-    }
-  };
 
-  const leftThumbs = [
-    destinations[(activeIndex + 1) % destinations.length],
-    destinations[(activeIndex + 2) % destinations.length],
-  ];
-  const rightThumbs = [
-    destinations[(activeIndex + 3) % destinations.length],
-    destinations[(activeIndex + 4) % destinations.length],
-  ];
+      if (thumbUi) {
+        if (isBecomingCenter || !willBeVisible) {
+          tl.to(thumbUi, { autoAlpha: 0, duration: 0.25 }, 0);
+        } else {
+          tl.to(thumbUi, { autoAlpha: 1, duration: 0.45 }, 0.2);
+        }
+      }
+    });
+  });
 
   return (
     <section
@@ -138,213 +390,187 @@ export function DestinationsSection() {
       className="py-8 md:py-12 lg:py-14"
     >
       <Container>
-        {/* Desktop BENTO Layout: Left heading + 2 thumbs (23%) | Center featured card (54%) | Right 2 thumbs (23%) */}
-        <div className="hidden lg:grid lg:grid-cols-[23%_1fr_23%] gap-3 items-stretch">
-          {/* Left Column */}
-          <div className="flex flex-col justify-between gap-4">
-            <div className="pt-1">
-              <p
-                data-reveal
-                className="text-[13px] font-medium text-ink-muted mb-1"
-              >
-                Popular destinations
-              </p>
-              <h2
-                id="destinations-heading"
-                data-reveal
-                className="text-[clamp(1.75rem,3.2vw,2.75rem)] font-medium tracking-[-0.03em] leading-[1.06] text-ink"
-              >
-                Destinations You’ll Love
-              </h2>
-              <p
-                data-reveal
-                className="mt-2 text-sm text-ink-muted leading-snug"
-              >
-                Select any city below to preview stays, visa guidance, and seasonal fares.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3" data-reveal>
-              {leftThumbs.map((item) => {
-                const idx = destinations.findIndex((d) => d.id === item.id);
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    data-dest-thumb
-                    onClick={() => switchDestination(idx, 1)}
-                    className="group text-left cursor-pointer focus:outline-none"
-                  >
-                    <div className="relative aspect-[4/5] w-full rounded-[18px] overflow-hidden border border-line bg-surface">
-                      <Image
-                        src={item.image}
-                        alt={`${item.name}, ${item.country}`}
-                        fill
-                        placeholder="blur"
-                        blurDataURL={BLUR_DATA_URL}
-                        sizes="180px"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="mt-1.5 flex items-center justify-between text-xs px-0.5">
-                      <span className="font-mono text-ink-muted">
-                        0{idx + 1}
-                      </span>
-                      <span className="font-medium text-ink truncate ml-2 group-hover:underline">
-                        {item.name}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Center Featured Card (~54% width) */}
-          <div className="relative" data-reveal>
-            <div
-              ref={featuredRef}
-              className="relative aspect-[16/13] xl:aspect-[5/4] w-full rounded-[24px] flex flex-col justify-between p-5 md:p-7"
+        {/* Desktop Horizontal Track: [thumb -2] [thumb -1] [FEATURED 0] [thumb +1] [thumb +2] */}
+        <div
+          ref={trackRef}
+          data-reveal
+          className="hidden lg:block relative w-full h-[500px] xl:h-[550px] overflow-hidden select-none"
+        >
+          {/* Top-Left Section Heading sitting above the 2 left thumbnails */}
+          <div className="absolute top-2 left-0 w-[22%] z-20 pointer-events-none pr-2">
+            <p className="text-[13px] font-medium text-ink-muted mb-1">
+              Popular destinations
+            </p>
+            <h2
+              id="destinations-heading"
+              className="text-[clamp(1.75rem,3vw,2.65rem)] font-medium tracking-[-0.03em] leading-[1.06] text-ink"
             >
-              {/* Layered Background Images for smooth GSAP cross-fade + scale transitions */}
+              Destinations You’ll Love
+            </h2>
+            <p className="mt-2 text-sm text-ink-muted leading-snug">
+              Select any city below to preview stays, visa guidance, and seasonal fares.
+            </p>
+          </div>
+
+          {/* Persistent Destination Cards on the Horizontal Track */}
+          {destinations.map((dest, idx) => {
+            const offset = getCircularOffset(idx, activeIndex, destinations.length);
+            const isCenter = offset === 0;
+            const isVisible = Math.abs(offset) <= 2;
+
+            return (
               <div
-                ref={destWebGLRef}
-                className="absolute inset-0 z-0 rounded-[24px] overflow-hidden border border-line bg-ink"
+                key={dest.id}
+                ref={(el) => {
+                  cardRefs.current[idx] = el;
+                }}
+                data-dest-card={dest.id}
+                data-slot-offset={offset}
+                onClick={() => {
+                  if (!isCenter && isVisible) {
+                    slideByOffset(offset);
+                  }
+                }}
+                role={!isCenter && isVisible ? "button" : undefined}
+                tabIndex={!isCenter && isVisible ? 0 : -1}
+                aria-label={
+                  !isCenter && isVisible
+                    ? `Slide ${dest.name}, ${dest.country} into featured view`
+                    : undefined
+                }
+                onKeyDown={(e) => {
+                  if (
+                    !isCenter &&
+                    isVisible &&
+                    (e.key === "Enter" || e.key === " ")
+                  ) {
+                    e.preventDefault();
+                    slideByOffset(offset);
+                  }
+                }}
+                className={cn(
+                  "absolute top-0 left-0 will-change-transform",
+                  !isCenter && isVisible && "cursor-pointer group"
+                )}
               >
-                {destinations.map((dest, idx) => (
+                {/* Media Frame (animates between 18px thumbnail radius and 24px featured radius) */}
+                <div
+                  ref={(el) => {
+                    mediaRefs.current[idx] = el;
+                  }}
+                  data-card-media
+                  className="relative w-full overflow-hidden border border-line bg-ink"
+                >
+                  <Image
+                    src={dest.image}
+                    alt={`${dest.name}, ${dest.country}`}
+                    fill
+                    placeholder="blur"
+                    blurDataURL={BLUR_DATA_URL}
+                    sizes="(min-width: 1024px) 54vw, 95vw"
+                    className={cn(
+                      "object-cover transition-transform duration-500",
+                      !isCenter && "group-hover:scale-105"
+                    )}
+                  />
+
+                  {/* Featured Overlay UI (visible when card is in Center Slot 0) */}
                   <div
-                    key={dest.id}
                     ref={(el) => {
-                      imageLayersRef.current[idx] = el;
+                      featuredUiRefs.current[idx] = el;
                     }}
-                    style={{
-                      opacity: idx === activeIndex ? 1 : 0,
-                      visibility: idx === activeIndex ? "visible" : "hidden",
-                      zIndex: idx === activeIndex ? 2 : 1,
-                    }}
-                    className="absolute inset-0 will-change-transform"
+                    data-featured-ui
+                    className="absolute inset-0 flex flex-col justify-between p-5 md:p-7"
                   >
-                    <Image
-                      src={dest.image}
-                      alt={`${dest.name}, ${dest.country}`}
-                      fill
-                      loading="eager"
-                      placeholder="blur"
-                      blurDataURL={BLUR_DATA_URL}
-                      sizes="(min-width: 1024px) 54vw, 95vw"
-                      className="object-cover"
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/40"
                     />
-                  </div>
-                ))}
-              </div>
 
-              {/* Scrim overlay (z-[3]) */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 z-[3] rounded-[24px] bg-gradient-to-t from-black/80 via-black/15 to-black/40"
-              />
+                    {/* Top bar: functional tags left + prev/next arrows & "View all destinations" top-right */}
+                    <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 text-xs font-medium text-white">
+                          from {formatUsd(dest.priceFrom)}
+                        </span>
+                        <span className="rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 text-xs font-medium text-white">
+                          {dest.visaQuickInfo}
+                        </span>
+                      </div>
 
-              {/* Top bar: functional tags left + prev/next arrows & "View all destinations" top-right */}
-              <div className="relative z-[5] flex flex-wrap items-center justify-between gap-2">
-                <div ref={tagsRef} className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 text-xs font-medium text-white">
-                    from {formatUsd(featured.priceFrom)}
-                  </span>
-                  <span className="rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 text-xs font-medium text-white">
-                    {featured.visaQuickInfo}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => switchDestination(activeIndex - 1, -1)}
-                    aria-label="Previous destination"
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/45 backdrop-blur-md border border-white/25 text-white hover:bg-black/65 transition-colors cursor-pointer"
-                  >
-                    <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => switchDestination(activeIndex + 1, 1)}
-                    aria-label="Next destination"
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#0A0A0A] hover:opacity-90 transition-opacity cursor-pointer"
-                  >
-                    <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
-                  </button>
-                  <Link
-                    href="/hotels"
-                    className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/25 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-black/65 transition-colors"
-                  >
-                    <span>View all destinations</span>
-                    <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Bottom destination title & tagline */}
-              <div ref={metaRef} className="relative z-[5] text-white space-y-1.5">
-                <p className="font-mono text-xs text-white/80">
-                  0{activeIndex + 1} / 0{destinations.length} · {featured.duration} ({featured.bestSeason})
-                </p>
-                <div className="flex items-end justify-between gap-4">
-                  <div>
-                    <h3 className="text-3xl md:text-4xl font-medium tracking-[-0.03em]">
-                      {featured.name}, {featured.country}
-                    </h3>
-                    <p className="mt-1 text-sm text-white/85 max-w-md">
-                      {featured.tagline}
-                    </p>
-                  </div>
-                  <Link
-                    href={`/hotels?city=${encodeURIComponent(featured.name)}`}
-                    aria-label={`Explore stays in ${featured.name}`}
-                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-[#0A0A0A] transition-transform hover:scale-105"
-                  >
-                    <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: aligned 2 thumbnails at bottom (no empty white card) */}
-          <div className="flex flex-col justify-end">
-            <div className="grid grid-cols-2 gap-3" data-reveal>
-              {rightThumbs.map((item) => {
-                const idx = destinations.findIndex((d) => d.id === item.id);
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    data-dest-thumb
-                    onClick={() => switchDestination(idx, 1)}
-                    className="group text-left cursor-pointer focus:outline-none"
-                  >
-                    <div className="relative aspect-[4/5] w-full rounded-[18px] overflow-hidden border border-line bg-surface">
-                      <Image
-                        src={item.image}
-                        alt={`${item.name}, ${item.country}`}
-                        fill
-                        placeholder="blur"
-                        blurDataURL={BLUR_DATA_URL}
-                        sizes="180px"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
+                      <div
+                        className="flex items-center gap-1.5"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => slideByOffset(-1)}
+                          aria-label="Previous destination"
+                          className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/45 backdrop-blur-md border border-white/25 text-white hover:bg-black/65 transition-colors cursor-pointer"
+                        >
+                          <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => slideByOffset(1)}
+                          aria-label="Next destination"
+                          className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#0A0A0A] hover:opacity-90 transition-opacity cursor-pointer"
+                        >
+                          <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+                        </button>
+                        <Link
+                          href="/hotels"
+                          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/25 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-black/65 transition-colors"
+                        >
+                          <span>View all destinations</span>
+                          <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
+                        </Link>
+                      </div>
                     </div>
-                    <div className="mt-1.5 flex items-center justify-between text-xs px-0.5">
-                      <span className="font-mono text-ink-muted">
-                        0{idx + 1}
-                      </span>
-                      <span className="font-medium text-ink truncate ml-2 group-hover:underline">
-                        {item.name}
-                      </span>
+
+                    {/* Bottom destination title & tagline */}
+                    <div className="relative z-10 text-white space-y-1.5">
+                      <p className="font-mono text-xs text-white/80">
+                        0{idx + 1} / 0{destinations.length} · {dest.duration} ({dest.bestSeason})
+                      </p>
+                      <div className="flex items-end justify-between gap-4">
+                        <div>
+                          <h3 className="text-3xl md:text-4xl font-medium tracking-[-0.03em]">
+                            {dest.name}, {dest.country}
+                          </h3>
+                          <p className="mt-1 text-sm text-white/85 max-w-md">
+                            {dest.tagline}
+                          </p>
+                        </div>
+                        <Link
+                          href={`/hotels?city=${encodeURIComponent(dest.name)}`}
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Explore stays in ${dest.name}`}
+                          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-[#0A0A0A] transition-transform hover:scale-105"
+                        >
+                          <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />
+                        </Link>
+                      </div>
                     </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+                  </div>
+                </div>
+
+                {/* Thumbnail Bottom Caption (visible when card is in a Thumbnail Slot) */}
+                <div
+                  ref={(el) => {
+                    thumbUiRefs.current[idx] = el;
+                  }}
+                  data-thumb-ui
+                  className="mt-1.5 flex items-center justify-between text-xs px-0.5 h-5"
+                >
+                  <span className="font-mono text-ink-muted">0{idx + 1}</span>
+                  <span className="font-medium text-ink truncate ml-2 group-hover:underline">
+                    {dest.name}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Mobile / Tablet Scroll-Snap Slider */}
