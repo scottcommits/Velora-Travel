@@ -141,9 +141,9 @@ export function SearchTabs() {
   };
 
   return (
-    <SearchBarShell floating className="p-3 sm:p-4">
+    <SearchBarShell floating className="p-2.5 sm:p-3 bg-surface/95 backdrop-blur-xl">
       {/* Top bar: Service pill tabs + Trip type toggle on Flights */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2 border-b border-line px-1">
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-2 mb-1.5 border-b border-line px-1">
         <div
           role="tablist"
           aria-label="Search travel services"
@@ -166,7 +166,7 @@ export function SearchTabs() {
                 onClick={() => setActiveTab(tab.id)}
                 onKeyDown={(e) => onTabKeyDown(e, idx)}
                 className={cn(
-                  "h-[34px] rounded-full px-3.5 text-[13px] font-medium transition-colors cursor-pointer",
+                  "min-h-11 rounded-full px-4 text-[13px] font-medium transition-colors cursor-pointer",
                   selected
                     ? "bg-ink text-bg"
                     : "bg-transparent text-ink-muted hover:text-ink"
@@ -185,7 +185,7 @@ export function SearchTabs() {
               <label
                 key={mode}
                 className={cn(
-                  "inline-flex h-[32px] items-center rounded-full border px-3 text-[12px] font-medium cursor-pointer transition-colors",
+                  "inline-flex min-h-11 items-center rounded-full border px-3.5 text-[12px] font-medium cursor-pointer transition-colors",
                   tripType === mode
                     ? "bg-ink text-bg border-ink"
                     : "bg-surface text-ink-muted border-line hover:text-ink"
@@ -295,7 +295,7 @@ export function SearchTabs() {
                   setFlightTo(flightFrom);
                 }}
                 aria-label="Swap origin and destination cities"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink-muted hover:text-ink hover:border-ink transition-colors cursor-pointer"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-muted hover:text-ink hover:border-ink transition-colors cursor-pointer"
               >
                 <ArrowLeftRight className="h-3.5 w-3.5" strokeWidth={1.6} aria-hidden="true" />
               </button>

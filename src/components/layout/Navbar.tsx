@@ -10,14 +10,16 @@ import { cn } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { ThemeToggle } from "./ThemeToggle";
-import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, MOTION_OK } from "@/lib/gsap";
 
 export function Navbar() {
   const pathname = usePathname();
   const scrolled = useScrolled(12);
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const toggleBtnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -40,6 +42,26 @@ export function Navbar() {
 
   useGSAP(
     () => {
+      const mm = gsap.matchMedia();
+      mm.add(MOTION_OK, () => {
+        if (!progressRef.current) return;
+        gsap.set(progressRef.current, { scaleX: 0, transformOrigin: "left center" });
+        ScrollTrigger.create({
+          start: 0,
+          end: "max",
+          onUpdate: (self) => {
+            if (progressRef.current) {
+              gsap.set(progressRef.current, { scaleX: self.progress });
+            }
+          },
+        });
+      });
+    },
+    { scope: headerRef, dependencies: [pathname] }
+  );
+
+  useGSAP(
+    () => {
       if (!open) return;
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
@@ -53,59 +75,86 @@ export function Navbar() {
     { scope: menuRef, dependencies: [open] }
   );
 
+  const glassPill = cn(
+    "pointer-events-auto rounded-full border transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300",
+    scrolled
+      ? "bg-surface/92 backdrop-blur-xl border-ink/15 shadow-[0_6px_24px_rgba(0,0,0,0.06)]"
+      : "bg-surface/80 backdrop-blur-md border-line"
+  );
+
   return (
     <header
-      className={cn(
-        "sticky top-0 z-50 w-full transition-colors duration-200",
-        scrolled
-          ? "bg-bg/85 backdrop-blur-md border-b border-line"
-          : "bg-bg border-b border-transparent"
-      )}
+      ref={headerRef}
+      className="sticky top-0 z-50 w-full bg-transparent border-none pointer-events-none"
     >
       <Container>
         <nav
           aria-label="Primary"
-          className="flex h-16 items-center justify-between gap-4"
+          className="flex h-16 items-center justify-between gap-3"
         >
+          {/* Left Logo Glass Pill */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-lg font-semibold tracking-[-0.03em] text-ink"
+            className={cn(
+              glassPill,
+              "inline-flex h-11 items-center gap-2 px-4 text-base font-semibold tracking-[-0.03em] text-ink hover:border-ink/40"
+            )}
           >
-            <Compass className="h-5 w-5 text-ink" strokeWidth={1.75} aria-hidden="true" />
+            <Compass className="h-4 w-4 text-ink" strokeWidth={1.75} aria-hidden="true" />
             <span>Velora</span>
           </Link>
 
-          <ul className="hidden lg:flex items-center gap-1 rounded-full border border-line bg-surface px-2 py-1">
-            {primaryNav.map((item) => {
-              const isHash = item.href.startsWith("/#");
-              const isActive = !isHash && pathname === item.href;
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    aria-current={isActive ? "page" : undefined}
-                    className={cn(
-                      "inline-flex h-9 items-center rounded-full px-3.5 text-[13px] font-medium transition-colors",
-                      isActive
-                        ? "bg-ink text-bg"
-                        : "text-ink-muted hover:text-ink"
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          {/* Center Navigation Glass Pill + subtle scroll progress bar */}
+          <div
+            className={cn(
+              glassPill,
+              "hidden lg:flex relative items-center overflow-hidden px-1.5 py-1"
+            )}
+          >
+            <ul className="flex items-center gap-0.5">
+              {primaryNav.map((item) => {
+                const isHash = item.href.startsWith("/#");
+                const isActive = !isHash && pathname === item.href;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={cn(
+                        "inline-flex h-9 items-center rounded-full px-3.5 text-[13px] font-medium transition-colors",
+                        isActive
+                          ? "bg-ink text-bg"
+                          : "text-ink-muted hover:text-ink"
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <span
+              ref={progressRef}
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-3 bottom-0 h-[1.5px] origin-left scale-x-0 bg-ink/35"
+            />
+          </div>
 
+          {/* Right Actions Glass Pills */}
           <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <div className="hidden sm:block">
+            <ThemeToggle scrolled={scrolled} />
+            <div
+              className={cn(
+                glassPill,
+                "hidden sm:flex items-center p-1"
+              )}
+            >
               <ButtonLink
                 href="/#contact"
                 variant="primary"
-                size="md"
+                size="sm"
                 withArrow
+                className="min-h-9"
               >
                 Plan a trip
               </ButtonLink>
@@ -117,7 +166,10 @@ export function Navbar() {
               aria-expanded={open}
               aria-controls="mobile-nav-drawer"
               aria-label={open ? "Close navigation menu" : "Open navigation menu"}
-              className="inline-flex lg:hidden h-11 items-center gap-2 rounded-full border border-line bg-surface px-4 text-xs font-medium text-ink cursor-pointer"
+              className={cn(
+                glassPill,
+                "inline-flex lg:hidden h-11 items-center gap-2 px-4 text-xs font-medium text-ink cursor-pointer"
+              )}
             >
               {open ? (
                 <>
@@ -142,7 +194,8 @@ export function Navbar() {
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation"
-          className="fixed inset-x-0 top-16 bottom-0 z-50 bg-bg border-t border-line lg:hidden overflow-y-auto shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+          data-lenis-prevent
+          className="pointer-events-auto fixed inset-x-0 top-16 bottom-0 z-50 bg-bg border-t border-line lg:hidden overflow-y-auto shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
         >
           <Container className="py-8 flex flex-col justify-between min-h-full">
             <ul className="flex flex-col divide-y divide-line">

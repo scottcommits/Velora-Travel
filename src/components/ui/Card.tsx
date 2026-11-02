@@ -1,13 +1,14 @@
 import { cn } from "@/lib/utils";
 import type { ElementType, ComponentPropsWithoutRef } from "react";
 
-type Padding = "none" | "sm" | "md" | "lg";
+type Padding = "none" | "inset" | "sm" | "md" | "lg";
 
 const paddingStyles: Record<Padding, string> = {
   none: "p-0",
-  sm: "p-4",
-  md: "p-5",
-  lg: "p-6",
+  inset: "p-2 md:p-2.5",
+  sm: "p-3",
+  md: "p-3 md:p-4",
+  lg: "p-3.5 md:p-4",
 };
 
 export type CardProps<T extends ElementType = "article"> = {

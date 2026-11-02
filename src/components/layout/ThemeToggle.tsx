@@ -22,7 +22,9 @@ function getServerSnapshot(): "light" | "dark" {
   return "light";
 }
 
-export function ThemeToggle() {
+import { cn } from "@/lib/utils";
+
+export function ThemeToggle({ scrolled = false }: { scrolled?: boolean }) {
   const theme = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerSnapshot);
 
   const toggle = () => {
@@ -38,7 +40,12 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-transparent text-ink transition-colors hover:border-ink cursor-pointer"
+      className={cn(
+        "pointer-events-auto inline-flex h-11 w-11 items-center justify-center rounded-full border transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 text-ink hover:border-ink cursor-pointer",
+        scrolled
+          ? "bg-surface/92 backdrop-blur-xl border-ink/15 shadow-[0_6px_24px_rgba(0,0,0,0.06)]"
+          : "bg-surface/80 backdrop-blur-md border-line"
+      )}
     >
       {theme === "dark" ? (
         <Sun className="h-4 w-4 text-ink" strokeWidth={1.5} aria-hidden="true" />

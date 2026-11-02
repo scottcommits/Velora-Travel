@@ -428,7 +428,7 @@ export function FilterChip({
     <button
       type="button"
       className={cn(
-        "inline-flex h-[34px] shrink-0 items-center justify-center rounded-full border px-3.5 text-[13px] font-medium transition-colors cursor-pointer select-none",
+        "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border px-4 text-[13px] font-medium transition-colors cursor-pointer select-none",
         active
           ? "bg-ink text-bg border-ink"
           : "bg-surface text-ink-muted border-line hover:text-ink hover:border-ink/40",

@@ -12,6 +12,18 @@
   --radius-media: 24px;
   --radius-card: 20px;
   --radius-ctl: 999px;
+
+  /* Compact spacing tokens (Owner override) */
+  --gutter: clamp(12px, 1.4vw, 24px);
+  --navbar-h: 64px;
+  --section-py-sm: 2rem;      /* 32px (py-8) */
+  --section-py-md: 3rem;      /* 48px (md:py-12) */
+  --section-py-lg: 3.5rem;    /* 56px (lg:py-14) */
+  --heading-gap: clamp(20px, 1.6vw, 24px);
+  --card-gap: 0.75rem;        /* 12px (gap-3) */
+  --card-pad-sm: 0.75rem;     /* 12px */
+  --card-pad-lg: 1rem;        /* 16px */
+  --card-inset: 0.5625rem;    /* 9px (8-10px photo inset) */
 }
 
 [data-theme="dark"] {
@@ -46,7 +58,6 @@
     background-color: var(--bg);
     color: var(--ink);
     font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
-    scroll-behavior: smooth;
     overflow-x: clip;
   }
 

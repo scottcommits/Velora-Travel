@@ -36,7 +36,7 @@ export function SectionHeading({
         {eyebrow ? (
           <p
             data-reveal
-            className="text-[13px] font-medium text-ink-muted mb-1.5"
+            className="text-[13px] font-medium text-ink-muted mb-1"
           >
             {eyebrow}
           </p>
@@ -51,7 +51,7 @@ export function SectionHeading({
         {subtitle ? (
           <p
             data-reveal
-            className="mt-2.5 text-base text-ink-muted leading-[1.6] max-w-[58ch]"
+            className="mt-2 text-base text-ink-muted leading-[1.55] max-w-[58ch]"
           >
             {subtitle}
           </p>
