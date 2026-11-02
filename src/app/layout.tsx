@@ -4,6 +4,8 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { SmoothScroll } from "@/components/layout/SmoothScroll";
+import { WebGLImageMount } from "@/components/webgl/WebGLImageMount";
 
 const sans = Geist({
   subsets: ["latin"],
@@ -70,11 +72,14 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <ToastProvider>
-          <Navbar />
-          <div className="flex-1 flex flex-col">{children}</div>
-          <Footer />
-        </ToastProvider>
+        <SmoothScroll>
+          <ToastProvider>
+            <Navbar />
+            <div className="flex-1 flex flex-col">{children}</div>
+            <Footer />
+            <WebGLImageMount />
+          </ToastProvider>
+        </SmoothScroll>
       </body>
     </html>
   );
