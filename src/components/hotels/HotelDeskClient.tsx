@@ -11,13 +11,12 @@ import {
   Plane,
   Building2,
   CarFront,
-  Sparkles,
   Check,
-  Coffee,
+  ArrowUpRight,
 } from "lucide-react";
 import type { Hotel } from "@/lib/types";
 import { hotelSearchSchema } from "@/lib/validators";
-import { formatUsd, BLUR_DATA_URL } from "@/lib/utils";
+import { formatUsd, BLUR_DATA_URL, cn } from "@/lib/utils";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -75,6 +74,13 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
     if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return 5;
     return Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)));
   }, [checkIn, checkOut]);
+
+  const spotlightHotel = useMemo(
+    () =>
+      initialHotels.find((h) => h.id === "caldera-suites-santorini") ??
+      initialHotels[0],
+    [initialHotels]
+  );
 
   const filteredHotels = useMemo(() => {
     return initialHotels.filter((hotel) => {
@@ -155,27 +161,28 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
     cityFilter !== "All" || maxPrice < 1000 || starFilter !== "All";
 
   return (
-    <div className="space-y-6">
-      {/* Cohesive Velora Hero Frame with Embedded Hotel Search Bar */}
-      <div className="relative overflow-hidden rounded-[28px] border border-line bg-ink text-white">
-        <Image
-          src="/images/services/hotel-sanctuary.jpg"
-          alt="Sunlit luxury resort suite terrace overlooking the sea"
-          fill
-          priority
-          sizes="96vw"
-          placeholder="blur"
-          blurDataURL={BLUR_DATA_URL}
-          className="object-cover object-center"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/48 to-black/32"
-        />
+    <div className="space-y-5">
+      {/* Top Editorial Bento Showcase: 8-Col Hero + Search & 4-Col Featured Sanctuary Card */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+        {/* Left 8 Cols: Main Sanctuary Hero with Embedded Search Bar */}
+        <div className="lg:col-span-8 relative min-h-[420px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
+          <Image
+            src="/images/services/hotel-sanctuary.jpg"
+            alt="Sunlit luxury resort suite terrace overlooking the sea"
+            fill
+            priority
+            sizes="(min-width: 1024px) 66vw, 96vw"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+            className="object-cover object-center"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25"
+          />
 
-        <div className="relative z-10 p-5 sm:p-7 md:p-9 flex flex-col justify-between gap-7">
-          {/* Top Bar: Service Desk Switcher + Sanctuary Badge */}
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* Top Service Desk Switcher */}
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
             <nav
               aria-label="Switch travel service desk"
               className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 p-1"
@@ -190,7 +197,7 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
                     className={
                       tab.active
                         ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
-                        : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white transition-colors"
+                        : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
                     }
                   >
                     <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
@@ -200,113 +207,141 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
               })}
             </nav>
 
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-white">
-              <Sparkles className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
-              3★ to 5★ Curated Stays
+            <span className="rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
+              3★ to 5★ Handpicked Stays
             </span>
           </div>
 
-          {/* Center Headline + 3 Sanctuary Perks */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-            <div className="lg:col-span-7 space-y-2.5">
-              <h1 className="text-[clamp(2rem,3.6vw,3.1rem)] font-medium tracking-[-0.03em] leading-[1.06] text-white">
-                Sanctuaries &amp; suites worth staying for.
+          {/* Bottom Headline + Embedded Search Bar */}
+          <div className="relative z-10 space-y-5 mt-auto">
+            <div className="max-w-xl space-y-2">
+              <h1 className="text-[clamp(2rem,3.8vw,3.25rem)] font-medium tracking-[-0.03em] leading-[1.05] text-white">
+                Places worth staying for.
               </h1>
-              <p className="text-sm sm:text-[15px] text-white/85 leading-relaxed max-w-xl">
-                Handpicked cliffside villas, historic ryokans, and design hotels—with daily breakfast, verified ratings, and transparent nightly rates.
+              <p className="text-sm sm:text-[15px] text-white/85 leading-relaxed">
+                Cliffside villas, historic ryokans, and architectural sanctuaries—with daily breakfast and transparent nightly rates.
               </p>
             </div>
 
-            <div className="lg:col-span-5 grid grid-cols-3 gap-2.5">
-              <div className="rounded-[16px] bg-white/12 backdrop-blur-md border border-white/20 p-3 text-left">
-                <p className="font-mono text-lg sm:text-xl font-medium text-white">
-                  4.8★
+            <SearchBarShell floating className="text-ink">
+              <form
+                onSubmit={handleDateSearch}
+                noValidate
+                className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
+              >
+                <div className="md:col-span-4">
+                  <BarSelect
+                    id="hotel-city-select"
+                    label="Destination"
+                    value={cityFilter}
+                    onChange={(e) => setCityFilter(e.target.value)}
+                  >
+                    {cities.map((c) => (
+                      <option key={c} value={c} className="bg-surface text-ink">
+                        {c === "All" ? "All cities" : c}
+                      </option>
+                    ))}
+                  </BarSelect>
+                </div>
+
+                <div className="md:col-span-3">
+                  <BarDate
+                    id="hotel-checkin"
+                    label="Check-in"
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <BarDate
+                    id="hotel-checkout"
+                    label="Check-out"
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                  />
+                </div>
+
+                <div className="md:col-span-1">
+                  <BarInput
+                    id="hotel-guests"
+                    label="Guests"
+                    type="number"
+                    min={1}
+                    max={12}
+                    value={guests}
+                    onChange={(e) =>
+                      setGuests(Math.max(1, Number(e.target.value) || 1))
+                    }
+                  />
+                </div>
+
+                <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
+                  <BarSubmitButton className="w-full justify-between">
+                    Search
+                  </BarSubmitButton>
+                </div>
+              </form>
+            </SearchBarShell>
+          </div>
+        </div>
+
+        {/* Right 4 Cols: Featured Sanctuary Spotlight Bento Card */}
+        {spotlightHotel ? (
+          <div className="lg:col-span-4 relative min-h-[340px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 flex flex-col justify-between group">
+            <Image
+              src={spotlightHotel.image}
+              alt={spotlightHotel.name}
+              fill
+              sizes="(min-width: 1024px) 32vw, 96vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/25"
+            />
+
+            <div className="relative z-10 flex items-center justify-between gap-2">
+              <span className="rounded-full bg-white/18 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
+                Featured Sanctuary
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-black/55 backdrop-blur-md border border-white/20 px-2.5 py-1 font-mono text-xs font-medium text-white">
+                <Star className="h-3 w-3 fill-current" aria-hidden="true" />
+                {spotlightHotel.stars}★ · {spotlightHotel.rating.toFixed(1)}
+              </span>
+            </div>
+
+            <div className="relative z-10 rounded-[18px] bg-white/14 backdrop-blur-md border border-white/25 p-4 space-y-3">
+              <div>
+                <p className="text-xs text-white/80">
+                  {spotlightHotel.city} · {spotlightHotel.neighborhood}
                 </p>
-                <p className="text-[11px] text-white/75 mt-0.5">
-                  Avg. guest score
-                </p>
+                <h2 className="text-xl font-medium tracking-[-0.02em] text-white mt-0.5">
+                  {spotlightHotel.name}
+                </h2>
               </div>
-              <div className="rounded-[16px] bg-white/12 backdrop-blur-md border border-white/20 p-3 text-left">
-                <p className="font-mono text-lg sm:text-xl font-medium text-white">
-                  Free
-                </p>
-                <p className="text-[11px] text-white/75 mt-0.5">
-                  Daily breakfast
-                </p>
-              </div>
-              <div className="rounded-[16px] bg-white/12 backdrop-blur-md border border-white/20 p-3 text-left">
-                <p className="font-mono text-lg sm:text-xl font-medium text-white">
-                  Flex
-                </p>
-                <p className="text-[11px] text-white/75 mt-0.5">
-                  48h cancellation
-                </p>
+
+              <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/20">
+                <div>
+                  <span className="font-mono text-lg font-medium text-white">
+                    {formatUsd(spotlightHotel.pricePerNight)}
+                  </span>
+                  <span className="text-xs text-white/75"> / night</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleBookHotel(spotlightHotel)}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink hover:opacity-90 transition-opacity cursor-pointer"
+                >
+                  <span>Book suite</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.8} />
+                </button>
               </div>
             </div>
           </div>
-
-          {/* Embedded Unified Hotel Search Bar */}
-          <SearchBarShell floating className="text-ink">
-            <form
-              onSubmit={handleDateSearch}
-              noValidate
-              className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
-            >
-              <div className="md:col-span-4">
-                <BarSelect
-                  id="hotel-city-select"
-                  label="Destination city"
-                  value={cityFilter}
-                  onChange={(e) => setCityFilter(e.target.value)}
-                >
-                  {cities.map((c) => (
-                    <option key={c} value={c} className="bg-surface text-ink">
-                      {c === "All" ? `All destinations (${cities.length - 1} cities)` : c}
-                    </option>
-                  ))}
-                </BarSelect>
-              </div>
-
-              <div className="md:col-span-2">
-                <BarDate
-                  id="hotel-checkin"
-                  label="Check-in"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <BarDate
-                  id="hotel-checkout"
-                  label="Check-out"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <BarInput
-                  id="hotel-guests"
-                  label="Guests"
-                  type="number"
-                  min={1}
-                  max={12}
-                  value={guests}
-                  onChange={(e) =>
-                    setGuests(Math.max(1, Number(e.target.value) || 1))
-                  }
-                />
-              </div>
-
-              <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
-                <BarSubmitButton className="w-full justify-between">
-                  Find Stays
-                </BarSubmitButton>
-              </div>
-            </form>
-          </SearchBarShell>
-        </div>
+        ) : null}
       </div>
 
       {dateError ? (
@@ -315,9 +350,53 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
         </p>
       ) : null}
 
-      {/* Single Clean Star & Nightly Rate Filter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-line bg-surface p-3.5 sm:px-5">
-        <div className="flex flex-wrap items-center gap-4 md:gap-6">
+      {/* Sleek Single Filter Strip: City Quick Pills + Star Tiers + Nightly Slider */}
+      <div className="rounded-[20px] border border-line bg-surface p-3.5 sm:px-5 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* City quick pills */}
+          <div
+            role="group"
+            aria-label="Filter by destination city"
+            className="flex flex-wrap items-center gap-1.5"
+          >
+            {cities.map((city) => {
+              const active = cityFilter === city;
+              return (
+                <button
+                  key={city}
+                  type="button"
+                  onClick={() => setCityFilter(city)}
+                  className={cn(
+                    "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer",
+                    active
+                      ? "bg-ink text-bg"
+                      : "bg-bg text-ink-muted hover:text-ink border border-line/70"
+                  )}
+                >
+                  {city === "All" ? "All Destinations" : city}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center gap-3 ml-auto text-xs text-ink-muted">
+            <span aria-live="polite" className="font-mono">
+              <strong className="text-ink font-medium">{filteredHotels.length}</strong>{" "}
+              {filteredHotels.length === 1 ? "stay" : "stays"}
+            </span>
+            {hasActiveFilters ? (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="text-xs font-medium text-ink underline underline-offset-4 cursor-pointer"
+              >
+                Clear filters
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-2.5 border-t border-line">
           <div
             role="group"
             aria-label="Filter by hotel star rating"
@@ -329,66 +408,42 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
                 active={starFilter === tier}
                 aria-pressed={starFilter === tier}
                 onClick={() => setStarFilter(tier)}
+                className="min-h-9 px-3.5 text-xs"
               >
-                {tier === "All"
-                  ? "All Star Tiers"
-                  : tier === 5
-                    ? "5 ★ Luxury"
-                    : tier === 4
-                      ? "4 ★ Boutique"
-                      : "3 ★ Comfort"}
+                {tier === "All" ? "All stars" : `${tier} ★`}
               </FilterChip>
             ))}
           </div>
 
-          <div className="hidden sm:block h-7 w-px bg-line" aria-hidden="true" />
-
           <PriceRangeSlider
             id="hotel-price-range"
-            label="Max nightly rate"
+            label="Nightly max"
             min={180}
             max={1000}
             step={20}
             value={maxPrice}
             onChange={setMaxPrice}
-            className="w-52 sm:w-60"
+            className="w-full sm:w-64"
           />
-        </div>
-
-        <div className="flex items-center gap-3 ml-auto text-xs text-ink-muted">
-          <span aria-live="polite" className="font-mono">
-            Showing{" "}
-            <strong className="text-ink font-medium">{filteredHotels.length}</strong>{" "}
-            {filteredHotels.length === 1 ? "property" : "properties"}
-          </span>
-          {hasActiveFilters ? (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="text-xs font-medium text-ink underline underline-offset-4 cursor-pointer"
-            >
-              Reset filters
-            </button>
-          ) : null}
         </div>
       </div>
 
-      {/* Results — Curated Sanctuary & Suite Cards */}
+      {/* Editorial Hotel Image Cards (4:3 Photo-First, Clean Whitespace, Zero Nested Box Clutter) */}
       {isLoading ? (
         <CardSkeleton count={6} />
       ) : filteredHotels.length === 0 ? (
-        <div className="rounded-[24px] border border-line bg-surface py-14 px-6 text-center space-y-3">
+        <div className="rounded-[22px] border border-line bg-surface py-14 px-6 text-center space-y-3">
           <p className="text-sm text-ink-muted">
-            No properties match your current nightly rate and star filters.
+            No hotels match your current price and star filters.
           </p>
           <Button variant="secondary" size="sm" onClick={clearFilters}>
-            Show all hotels
+            Clear filters
           </Button>
         </div>
       ) : (
         <div
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5"
         >
           {filteredHotels.map((hotel) => {
             const isBooked = bookedHotelId === hotel.id;
@@ -403,8 +458,8 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
                 className="group flex flex-col justify-between overflow-hidden rounded-[22px]"
               >
                 <div>
-                  {/* Suite Photography with Star Badge, Guest Score & Location Pin */}
-                  <div className="relative aspect-[16/10] w-full rounded-[16px] overflow-hidden bg-surface-2">
+                  {/* Lush 4:3 Property Photography */}
+                  <div className="relative aspect-[4/3] w-full rounded-[16px] overflow-hidden bg-surface-2">
                     <Image
                       src={hotel.image}
                       alt={`${hotel.name} in ${hotel.city}`}
@@ -416,54 +471,49 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
                     />
                     <div
                       aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/25"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/15"
                     />
 
-                    {/* Top badges: Star Tier + Guest Rating */}
-                    <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-2">
-                      <span
-                        aria-label={`${hotel.stars} star hotel`}
-                        className="inline-flex items-center gap-1 rounded-full bg-black/70 backdrop-blur-md border border-white/20 px-2.5 py-1 font-mono text-[11px] font-medium text-amber-300"
-                      >
-                        {"★".repeat(hotel.stars)}
-                        <span className="text-white ml-0.5">{hotel.stars}-Star</span>
-                      </span>
-
-                      <span
-                        aria-label={`Guest rating ${hotel.rating} out of 5`}
-                        className="inline-flex items-center gap-1 rounded-full bg-surface/95 backdrop-blur-md px-2.5 py-1 font-mono text-[11px] font-semibold text-ink shadow-xs"
-                      >
-                        <Star className="h-3 w-3 fill-current text-ink" aria-hidden="true" />
-                        {hotel.rating.toFixed(1)} · Exceptional
-                      </span>
-                    </div>
-
-                    {/* Bottom Location Pin Pill */}
-                    <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-black/65 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white">
-                        <MapPin className="h-3 w-3 text-white/85 shrink-0" strokeWidth={1.7} aria-hidden="true" />
+                    {/* Top Floating Glass Pills (max 2) */}
+                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-surface/92 backdrop-blur-md px-3 py-1 text-[11.5px] font-medium text-ink">
+                        <MapPin className="h-3 w-3 text-ink-muted shrink-0" strokeWidth={1.7} aria-hidden="true" />
                         {hotel.city} · {hotel.neighborhood}
                       </span>
+                      <span
+                        aria-label={`${hotel.stars} stars, rated ${hotel.rating}`}
+                        className="inline-flex items-center gap-1 rounded-full bg-ink/85 backdrop-blur-md px-2.5 py-1 font-mono text-[11px] font-medium text-white"
+                      >
+                        <Star className="h-3 w-3 fill-current" aria-hidden="true" />
+                        {hotel.stars}★ · {hotel.rating.toFixed(1)}
+                      </span>
                     </div>
+
+                    {hotel.badge ? (
+                      <div className="absolute bottom-3 left-3">
+                        <span className="rounded-full bg-black/60 backdrop-blur-md border border-white/20 px-2.5 py-1 text-[11px] font-medium text-white">
+                          {hotel.badge}
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
 
-                  {/* Property Name + Stay Summary + Scannable Amenity Pills */}
-                  <div className="px-2.5 pt-3.5 pb-2 space-y-2.5">
-                    <div>
-                      <h2 className="text-[18px] font-medium tracking-[-0.015em] text-ink">
+                  {/* Clean Editorial Typography & Amenity Pills */}
+                  <div className="px-3 pt-3.5 pb-2 space-y-2.5">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <h2 className="text-[18px] font-medium tracking-[-0.02em] text-ink">
                         {hotel.name}
                       </h2>
-                      <p className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-ink-muted">
-                        <Coffee className="h-3.5 w-3.5 text-ink" strokeWidth={1.6} aria-hidden="true" />
-                        Breakfast included · Free 48h cancellation
-                      </p>
+                      <span className="text-[11px] text-ink-muted shrink-0">
+                        {hotel.reviews} reviews
+                      </span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-1.5">
                       {hotel.amenities.map((amenity) => (
                         <span
                           key={amenity}
-                          className="rounded-full bg-bg px-2.5 py-1 text-[11px] font-medium text-ink-muted border border-line/70"
+                          className="rounded-full bg-bg px-2.5 py-1 text-[11px] font-medium text-ink-muted"
                         >
                           {amenity}
                         </span>
@@ -472,17 +522,17 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
                   </div>
                 </div>
 
-                {/* Bottom Nightly Rate + Multi-Night Stay Total Bar */}
-                <div className="mx-1 mb-1 mt-2 rounded-[14px] bg-bg/60 border border-line/70 px-3.5 py-2.5 flex items-center justify-between gap-3">
+                {/* Clean Hairline Footer */}
+                <div className="mx-3 pb-2.5 pt-3 mt-1 border-t border-line flex items-center justify-between gap-3">
                   <div>
                     <div className="flex items-baseline gap-1">
-                      <span className="font-mono text-lg font-semibold text-ink">
+                      <span className="font-mono text-lg font-medium text-ink">
                         {formatUsd(hotel.pricePerNight)}
                       </span>
                       <span className="text-xs text-ink-muted">/ night</span>
                     </div>
-                    <p className="font-mono text-[11px] text-ink-muted">
-                      {formatUsd(totalStayUsd)} total for {stayNights}{" "}
+                    <p className="text-[11px] text-ink-muted">
+                      {formatUsd(totalStayUsd)} total · {stayNights}{" "}
                       {stayNights === 1 ? "night" : "nights"}
                     </p>
                   </div>
@@ -499,7 +549,7 @@ export function HotelDeskClient({ initialHotels }: { initialHotels: Hotel[] }) {
                         Requested
                       </span>
                     ) : (
-                      "Book Stay"
+                      "Book"
                     )}
                   </Button>
                 </div>

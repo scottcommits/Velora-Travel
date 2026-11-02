@@ -9,23 +9,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   X,
   Clock,
-  FileCheck2,
-  ShieldCheck,
   Stamp,
   Plane,
   Building2,
   CarFront,
-  CheckCircle2,
-  Calendar,
-  Repeat,
+  ArrowUpRight,
 } from "lucide-react";
 import type { VisaOffer, VisaType } from "@/lib/types";
 import { visaCountries, visaTypesList } from "@/data/visas";
 import { visaApplicationSchema, type VisaApplicationInput } from "@/lib/validators";
-import { formatUsd, BLUR_DATA_URL } from "@/lib/utils";
+import { formatUsd, BLUR_DATA_URL, cn } from "@/lib/utils";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import {
   InputField,
@@ -77,6 +72,12 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
       notes: "",
     },
   });
+
+  const spotlightVisa = useMemo(
+    () =>
+      offers.find((o) => o.id === "schengen-tourist") ?? offers[0],
+    [offers]
+  );
 
   const filteredOffers = useMemo(() => {
     return offers.filter((offer) => {
@@ -161,7 +162,7 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
     e.preventDefault();
     notify({
       title: "Visa requirements filtered",
-      description: `Showing ${filteredOffers.length} official visa options.`,
+      description: `Showing ${filteredOffers.length} visa options.`,
     });
   };
 
@@ -181,27 +182,28 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
     searchQuery.trim() !== "";
 
   return (
-    <div className="space-y-6">
-      {/* Cohesive Velora Hero Frame with Embedded Visa Search Bar */}
-      <div className="relative overflow-hidden rounded-[28px] border border-line bg-ink text-white">
-        <Image
-          src="/images/services/visa-passport.jpg"
-          alt="Passport and travel documents on a consular desk"
-          fill
-          priority
-          sizes="96vw"
-          placeholder="blur"
-          blurDataURL={BLUR_DATA_URL}
-          className="object-cover object-center"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/35"
-        />
+    <div className="space-y-5">
+      {/* Top Editorial Bento Showcase: 8-Col Hero + Search & 4-Col Featured Visa Permit Card */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+        {/* Left 8 Cols: Consular Desk Hero with Embedded Search Bar */}
+        <div className="lg:col-span-8 relative min-h-[420px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 sm:p-7 flex flex-col justify-between gap-6">
+          <Image
+            src="/images/services/visa-passport.jpg"
+            alt="Passport and travel documents on a consular desk"
+            fill
+            priority
+            sizes="(min-width: 1024px) 66vw, 96vw"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+            className="object-cover object-center"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/38 to-black/25"
+          />
 
-        <div className="relative z-10 p-5 sm:p-7 md:p-9 flex flex-col justify-between gap-7">
-          {/* Top Bar: Service Desk Switcher + Official Consular Badge */}
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* Top Service Desk Switcher */}
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
             <nav
               aria-label="Switch travel service desk"
               className="inline-flex flex-wrap items-center gap-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 p-1"
@@ -216,7 +218,7 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
                     className={
                       tab.active
                         ? "inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink shadow-xs"
-                        : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white transition-colors"
+                        : "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85 hover:text-white transition-colors"
                     }
                   >
                     <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
@@ -226,154 +228,169 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
               })}
             </nav>
 
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-white">
-              <Stamp className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
+            <span className="rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
               e-Visa &amp; Consular Desk
             </span>
           </div>
 
-          {/* Center Headline + 3 Visual Visa Trust Pills */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-            <div className="lg:col-span-7 space-y-2.5">
-              <h1 className="text-[clamp(2rem,3.6vw,3.1rem)] font-medium tracking-[-0.03em] leading-[1.06] text-white">
-                Travel visas &amp; entry permits, simplified.
+          {/* Bottom Headline + Embedded Visa Search Bar */}
+          <div className="relative z-10 space-y-5 mt-auto">
+            <div className="max-w-xl space-y-2">
+              <h1 className="text-[clamp(2rem,3.8vw,3.25rem)] font-medium tracking-[-0.03em] leading-[1.05] text-white">
+                Visas without the guesswork.
               </h1>
-              <p className="text-sm sm:text-[15px] text-white/85 leading-relaxed max-w-xl">
-                Check exact embassy processing times, stay validity, and entry rules—then start your pre-checked visa application in minutes.
+              <p className="text-sm sm:text-[15px] text-white/85 leading-relaxed">
+                Check exact processing times, stay validity, and entry rules—then start your pre-checked visa application in minutes.
               </p>
             </div>
 
-            <div className="lg:col-span-5 grid grid-cols-3 gap-2.5">
-              <div className="rounded-[16px] bg-white/12 backdrop-blur-md border border-white/20 p-3 text-left">
-                <p className="font-mono text-lg sm:text-xl font-medium text-white">
-                  99.2%
+            <SearchBarShell floating className="text-ink">
+              <form
+                onSubmit={handleSearchSubmit}
+                noValidate
+                className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
+              >
+                <div className="md:col-span-4">
+                  <BarSelect
+                    id="visa-country-filter"
+                    label="Destination country"
+                    value={selectedCountry}
+                    onChange={(e) =>
+                      triggerFilterChange(() => setSelectedCountry(e.target.value))
+                    }
+                  >
+                    <option value="All" className="bg-surface text-ink">
+                      All countries ({visaCountries.length})
+                    </option>
+                    {visaCountries.map((country) => (
+                      <option key={country} value={country} className="bg-surface text-ink">
+                        {country}
+                      </option>
+                    ))}
+                  </BarSelect>
+                </div>
+
+                <div className="md:col-span-3">
+                  <BarSelect
+                    id="visa-type-select"
+                    label="Category"
+                    value={selectedType}
+                    onChange={(e) =>
+                      triggerFilterChange(() => setSelectedType(e.target.value))
+                    }
+                  >
+                    {visaTypesList.map((type) => (
+                      <option key={type} value={type} className="bg-surface text-ink">
+                        {type === "All" ? "All types" : `${type} Visa`}
+                      </option>
+                    ))}
+                  </BarSelect>
+                </div>
+
+                <div className="md:col-span-3">
+                  <BarInput
+                    id="visa-search-input"
+                    label="Search country or region"
+                    type="search"
+                    withSearchIcon
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Japan, Europe, AE..."
+                  />
+                </div>
+
+                <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
+                  <BarSubmitButton className="w-full justify-between">
+                    Search
+                  </BarSubmitButton>
+                </div>
+              </form>
+            </SearchBarShell>
+          </div>
+        </div>
+
+        {/* Right 4 Cols: Featured Schengen Permit Bento Card */}
+        {spotlightVisa ? (
+          <div className="lg:col-span-4 relative min-h-[340px] overflow-hidden rounded-[24px] border border-line bg-ink text-white p-5 flex flex-col justify-between group">
+            <Image
+              src={spotlightVisa.image}
+              alt={spotlightVisa.country}
+              fill
+              sizes="(min-width: 1024px) 32vw, 96vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/25"
+            />
+
+            <div className="relative z-10 flex items-center justify-between gap-2">
+              <span className="rounded-full bg-white/18 backdrop-blur-md border border-white/25 px-3 py-1 text-xs font-medium text-white">
+                Most Requested Permit
+              </span>
+              <span className="rounded-full bg-black/55 backdrop-blur-md border border-white/20 px-2.5 py-1 font-mono text-xs font-medium text-white">
+                {spotlightVisa.flag} · {spotlightVisa.entry} Entry
+              </span>
+            </div>
+
+            <div className="relative z-10 rounded-[18px] bg-white/14 backdrop-blur-md border border-white/25 p-4 space-y-3">
+              <div>
+                <p className="text-xs text-white/80">
+                  {spotlightVisa.processingDays} · {spotlightVisa.validity}
                 </p>
-                <p className="text-[11px] text-white/75 mt-0.5">
-                  First-try approval
-                </p>
+                <h2 className="text-xl font-medium tracking-[-0.02em] text-white mt-0.5">
+                  {spotlightVisa.country} ({spotlightVisa.visaType})
+                </h2>
               </div>
-              <div className="rounded-[16px] bg-white/12 backdrop-blur-md border border-white/20 p-3 text-left">
-                <p className="font-mono text-lg sm:text-xl font-medium text-white">
-                  2–15d
-                </p>
-                <p className="text-[11px] text-white/75 mt-0.5">
-                  Processing window
-                </p>
-              </div>
-              <div className="rounded-[16px] bg-white/12 backdrop-blur-md border border-white/20 p-3 text-left">
-                <p className="font-mono text-lg sm:text-xl font-medium text-white">
-                  100%
-                </p>
-                <p className="text-[11px] text-white/75 mt-0.5">
-                  Document pre-check
-                </p>
+
+              <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/20">
+                <div>
+                  <span className="font-mono text-lg font-medium text-white">
+                    {formatUsd(spotlightVisa.priceUsd)}
+                  </span>
+                  <span className="text-xs text-white/75"> / person</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveVisa(spotlightVisa)}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink hover:opacity-90 transition-opacity cursor-pointer"
+                >
+                  <span>Apply now</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.8} />
+                </button>
               </div>
             </div>
           </div>
-
-          {/* Embedded Unified Visa Search Bar */}
-          <SearchBarShell floating className="text-ink">
-            <form
-              onSubmit={handleSearchSubmit}
-              noValidate
-              className="grid grid-cols-1 md:grid-cols-12 items-center divide-y md:divide-y-0 md:divide-x divide-line"
-            >
-              <div className="md:col-span-4">
-                <BarSelect
-                  id="visa-country-filter"
-                  label="Destination country"
-                  value={selectedCountry}
-                  onChange={(e) =>
-                    triggerFilterChange(() => setSelectedCountry(e.target.value))
-                  }
-                >
-                  <option value="All" className="bg-surface text-ink">
-                    All countries ({visaCountries.length})
-                  </option>
-                  {visaCountries.map((country) => (
-                    <option key={country} value={country} className="bg-surface text-ink">
-                      {country}
-                    </option>
-                  ))}
-                </BarSelect>
-              </div>
-
-              <div className="md:col-span-3">
-                <BarSelect
-                  id="visa-type-select"
-                  label="Visa permit type"
-                  value={selectedType}
-                  onChange={(e) =>
-                    triggerFilterChange(() => setSelectedType(e.target.value))
-                  }
-                >
-                  {visaTypesList.map((type) => (
-                    <option key={type} value={type} className="bg-surface text-ink">
-                      {type === "All" ? "All visa categories" : `${type} Visa`}
-                    </option>
-                  ))}
-                </BarSelect>
-              </div>
-
-              <div className="md:col-span-3">
-                <BarInput
-                  id="visa-search-input"
-                  label="Quick search"
-                  type="search"
-                  withSearchIcon
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Country, region, or code..."
-                />
-              </div>
-
-              <div className="md:col-span-2 pt-2 md:pt-0 md:pl-2.5 flex justify-end border-none">
-                <BarSubmitButton className="w-full justify-between">
-                  Find Visas
-                </BarSubmitButton>
-              </div>
-            </form>
-          </SearchBarShell>
-        </div>
+        ) : null}
       </div>
 
-      {/* Simple 3-Step Visa Guide Strip + Category Filter Pills */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 rounded-[22px] border border-line bg-surface p-3.5 sm:px-5">
-        <div
-          role="group"
-          aria-label="Filter by visa type"
-          className="flex flex-wrap items-center gap-1.5"
-        >
-          {visaTypesList.map((type) => (
-            <FilterChip
-              key={type}
-              active={selectedType === type}
-              aria-pressed={selectedType === type}
-              onClick={() => triggerFilterChange(() => setSelectedType(type))}
-            >
-              {type === "All" ? "All Permits" : `${type} Visa`}
-            </FilterChip>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between lg:justify-end gap-4 text-xs text-ink-muted border-t lg:border-t-0 pt-2.5 lg:pt-0 border-line">
-          <div className="hidden xl:flex items-center gap-3 text-[12px] text-ink-muted">
-            <span className="inline-flex items-center gap-1.5">
-              <FileCheck2 className="h-3.5 w-3.5 text-ink" strokeWidth={1.6} />
-              Passport scan + photo only
-            </span>
-            <span aria-hidden="true">·</span>
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5 text-ink" strokeWidth={1.6} />
-              Embassy fee included
-            </span>
+      {/* Sleek Single Filter Strip: Country Quick Pills + Permit Categories */}
+      <div className="rounded-[20px] border border-line bg-surface p-3.5 sm:px-5 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div
+            role="group"
+            aria-label="Filter by visa type"
+            className="flex flex-wrap items-center gap-1.5"
+          >
+            {visaTypesList.map((type) => (
+              <FilterChip
+                key={type}
+                active={selectedType === type}
+                aria-pressed={selectedType === type}
+                onClick={() => triggerFilterChange(() => setSelectedType(type))}
+                className="min-h-9 px-3.5 text-xs"
+              >
+                {type === "All" ? "All Categories" : `${type} Visa`}
+              </FilterChip>
+            ))}
           </div>
 
-          <div className="flex items-center gap-3 ml-auto">
-            <span aria-live="polite" className="font-mono text-xs">
-              Showing{" "}
+          <div className="flex items-center gap-3 ml-auto text-xs text-ink-muted">
+            <span aria-live="polite" className="font-mono">
               <strong className="text-ink font-medium">{filteredOffers.length}</strong>{" "}
-              {filteredOffers.length === 1 ? "visa permit" : "visa permits"}
+              {filteredOffers.length === 1 ? "visa" : "visas"}
             </span>
             {hasActiveFilters ? (
               <button
@@ -381,141 +398,154 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
                 onClick={clearFilters}
                 className="text-xs font-medium text-ink underline underline-offset-4 cursor-pointer"
               >
-                Reset filters
+                Clear filters
               </button>
             ) : null}
           </div>
         </div>
+
+        {/* Quick Country Pills */}
+        <div
+          role="group"
+          aria-label="Quick country filter"
+          className="flex flex-wrap items-center gap-1.5 pt-2.5 border-t border-line"
+        >
+          <button
+            type="button"
+            onClick={() => triggerFilterChange(() => setSelectedCountry("All"))}
+            className={cn(
+              "rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer",
+              selectedCountry === "All"
+                ? "bg-ink text-bg"
+                : "bg-bg text-ink-muted hover:text-ink border border-line/70"
+            )}
+          >
+            All Countries
+          </button>
+          {visaCountries.map((country) => {
+            const active = selectedCountry === country;
+            return (
+              <button
+                key={country}
+                type="button"
+                onClick={() =>
+                  triggerFilterChange(() => setSelectedCountry(country))
+                }
+                className={cn(
+                  "rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer",
+                  active
+                    ? "bg-ink text-bg"
+                    : "bg-bg text-ink-muted hover:text-ink border border-line/70"
+                )}
+              >
+                {country}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Results — Official Entry Permit / Passport Visa Cards */}
+      {/* Editorial Country Visa Cards (4:3 Photo-First, Clean Whitespace, Hairline Footer) */}
       {isFiltering ? (
         <CardSkeleton count={6} />
       ) : filteredOffers.length === 0 ? (
-        <div className="rounded-[24px] border border-line bg-surface py-14 px-6 text-center space-y-3">
+        <div className="rounded-[22px] border border-line bg-surface py-14 px-6 text-center space-y-3">
           <p className="text-sm text-ink-muted">
-            No visa permits match your current country or category filter.
+            No visas match your current filters.
           </p>
           <Button variant="secondary" size="sm" onClick={clearFilters}>
-            Show all visas
+            Clear filters
           </Button>
         </div>
       ) : (
         <div
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5"
         >
           {filteredOffers.map((offer) => (
             <Card
               key={offer.id}
               data-visa-card
               interactive
-              padding="none"
+              padding="inset"
               className="group flex flex-col justify-between overflow-hidden rounded-[22px]"
             >
               <div>
-                {/* Top Official Entry Permit Header Bar */}
-                <div className="flex items-center justify-between gap-3 px-4 py-3.5 border-b border-line bg-bg/55">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      aria-hidden="true"
-                      className="flex h-10 w-11 shrink-0 items-center justify-center rounded-[12px] border border-line bg-surface font-mono text-xs font-semibold tracking-wider text-ink shadow-2xs"
-                    >
-                      {offer.flag}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink-muted">
-                        Entry Permit · {offer.region}
-                      </p>
-                      <h2 className="text-[17px] font-medium tracking-[-0.015em] text-ink truncate">
-                        {offer.country}
-                      </h2>
-                    </div>
-                  </div>
+                {/* Lush 4:3 Destination Landmark Photo */}
+                <div className="relative aspect-[4/3] w-full rounded-[16px] overflow-hidden bg-surface-2">
+                  <Image
+                    src={offer.image}
+                    alt={`${offer.country} ${offer.visaType} visa`}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 95vw"
+                    placeholder="blur"
+                    blurDataURL={BLUR_DATA_URL}
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                  />
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/15"
+                  />
 
-                  <Badge tone="ink" className="shrink-0">
-                    {offer.visaType} Visa
-                  </Badge>
-                </div>
-
-                {/* Destination Landmark Visual */}
-                <div className="px-3 pt-3">
-                  <div className="relative aspect-[16/9] w-full rounded-[14px] overflow-hidden bg-surface-2">
-                    <Image
-                      src={offer.image}
-                      alt={`${offer.country} ${offer.visaType} visa`}
-                      fill
-                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 95vw"
-                      placeholder="blur"
-                      blurDataURL={BLUR_DATA_URL}
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                    />
-                    <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-full bg-black/65 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white">
-                      <CheckCircle2 className="h-3 w-3 text-emerald-400" strokeWidth={2} aria-hidden="true" />
-                      e-Visa / Embassy Verified
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3-Column Official Visa Spec Stamp Box */}
-                <div className="px-3 pt-3">
-                  <div className="grid grid-cols-3 divide-x divide-line rounded-[14px] border border-line/80 bg-bg/65 py-2.5 px-1 text-center">
-                    <div className="px-1.5">
-                      <p className="inline-flex items-center justify-center gap-1 text-[10px] font-mono uppercase tracking-wider text-ink-muted">
-                        <Clock className="h-3 w-3" strokeWidth={1.6} aria-hidden="true" />
-                        Processing
-                      </p>
-                      <p className="mt-0.5 font-mono text-xs font-medium text-ink">
-                        {offer.processingDays}
-                      </p>
-                    </div>
-                    <div className="px-1.5">
-                      <p className="inline-flex items-center justify-center gap-1 text-[10px] font-mono uppercase tracking-wider text-ink-muted">
-                        <Calendar className="h-3 w-3" strokeWidth={1.6} aria-hidden="true" />
-                        Validity
-                      </p>
-                      <p className="mt-0.5 font-mono text-xs font-medium text-ink">
-                        {offer.validity}
-                      </p>
-                    </div>
-                    <div className="px-1.5">
-                      <p className="inline-flex items-center justify-center gap-1 text-[10px] font-mono uppercase tracking-wider text-ink-muted">
-                        <Repeat className="h-3 w-3" strokeWidth={1.6} aria-hidden="true" />
-                        Entry
-                      </p>
-                      <p className="mt-0.5 font-mono text-xs font-medium text-ink">
-                        {offer.entry}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Visa Highlights Preview Chips */}
-                <div className="px-3.5 pt-3 pb-2 flex flex-wrap items-center gap-1.5">
-                  {offer.highlights.map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-full bg-bg px-2.5 py-0.5 text-[11px] font-medium text-ink-muted border border-line/70"
-                    >
-                      {item}
+                  {/* Top Floating Glass Pills (max 2) */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-surface/92 backdrop-blur-md px-3 py-1 text-[11.5px] font-medium text-ink">
+                      <span className="font-mono font-semibold">{offer.flag}</span>
+                      <span>·</span>
+                      <span>{offer.region}</span>
                     </span>
-                  ))}
+                    <span className="rounded-full bg-ink/85 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white">
+                      {offer.visaType}
+                    </span>
+                  </div>
+
+                  {/* Bottom Processing Window Pill */}
+                  <div className="absolute bottom-3 left-3">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 px-2.5 py-1 font-mono text-[11px] font-medium text-white">
+                      <Clock className="h-3 w-3" strokeWidth={1.7} aria-hidden="true" />
+                      {offer.processingDays}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Clean Country Title & Highlight Pills */}
+                <div className="px-3 pt-3.5 pb-2 space-y-2.5">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <h2 className="text-[18px] font-medium tracking-[-0.02em] text-ink">
+                      {offer.country}
+                    </h2>
+                    <span className="font-mono text-[11px] text-ink-muted shrink-0">
+                      {offer.entry} · {offer.validity}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {offer.highlights.map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full bg-bg px-2.5 py-1 text-[11px] font-medium text-ink-muted"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* Bottom Embassy Fee + Apply CTA */}
-              <div className="mx-3 mb-3 mt-2 rounded-[14px] bg-bg/50 border border-line/60 px-3.5 py-2.5 flex items-center justify-between gap-3">
+              {/* Clean Hairline Footer */}
+              <div className="mx-3 pb-2.5 pt-3 mt-1 border-t border-line flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-[10.5px] text-ink-muted leading-tight">
-                    Total visa &amp; consular fee
-                  </p>
-                  <div className="mt-0.5 flex items-baseline gap-1">
+                  <div className="flex items-baseline gap-1">
                     <span className="font-mono text-lg font-medium text-ink">
                       {formatUsd(offer.priceUsd)}
                     </span>
-                    <span className="text-xs text-ink-muted">/ applicant</span>
+                    <span className="text-xs text-ink-muted">/ person</span>
                   </div>
+                  <p className="text-[11px] text-ink-muted">
+                    Embassy fee included
+                  </p>
                 </div>
+
                 <Button
                   variant="primary"
                   size="sm"
@@ -558,10 +588,10 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
                     id="visa-modal-title"
                     className="mt-0.5 text-xl font-medium text-ink"
                   >
-                    Apply for {activeVisa.country} Visa
+                    Apply for {activeVisa.country}
                   </h2>
                   <p className="font-mono text-xs text-ink-muted mt-0.5">
-                    Embassy &amp; processing fee: {formatUsd(activeVisa.priceUsd)} / person
+                    Fee: {formatUsd(activeVisa.priceUsd)} / person
                   </p>
                 </div>
               </div>
@@ -582,7 +612,7 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
             >
               <InputField
                 id="visa-app-name"
-                label="Applicant full name (as on passport)"
+                label="Full name"
                 placeholder="Alex Morgan"
                 error={errors.fullName?.message}
                 {...register("fullName")}
@@ -591,14 +621,14 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
                 <InputField
                   id="visa-app-email"
                   type="email"
-                  label="Email for visa delivery"
+                  label="Email"
                   placeholder="alex@example.com"
                   error={errors.email?.message}
                   {...register("email")}
                 />
                 <InputField
                   id="visa-app-passport"
-                  label="Passport nationality"
+                  label="Passport country"
                   placeholder="United Kingdom"
                   error={errors.passportCountry?.message}
                   {...register("passportCountry")}
@@ -607,14 +637,14 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
               <InputField
                 id="visa-app-date"
                 type="date"
-                label="Planned arrival date"
+                label="Travel date"
                 error={errors.travelDate?.message}
                 {...register("travelDate")}
               />
               <TextareaField
                 id="visa-app-notes"
-                label="Additional notes (optional)"
-                placeholder="Number of applicants, expedited request, or questions..."
+                label="Notes (optional)"
+                placeholder="Any questions or details..."
                 error={errors.notes?.message}
                 {...register("notes")}
               />
@@ -629,7 +659,7 @@ export function VisaDeskClient({ offers }: { offers: VisaOffer[] }) {
                   Cancel
                 </Button>
                 <Button type="submit" size="sm" withArrow disabled={isSubmitting}>
-                  {isSubmitting ? "Submitting..." : "Submit visa application"}
+                  {isSubmitting ? "Submitting..." : "Submit application"}
                 </Button>
               </div>
             </form>
