@@ -39,11 +39,11 @@ function computeSlotGeometry(
   const sideGroupW = Math.floor((trackWidth - featuredW - gap * 2) / 2);
   const thumbW = Math.max(96, Math.floor((sideGroupW - gap) / 2));
   const thumbMediaH = Math.min(
-    trackHeight - captionH - 180,
-    Math.round(thumbW * 1.24)
+    trackHeight - captionH,
+    Math.round(thumbW * 1.32)
   );
   const thumbTotalH = thumbMediaH + captionH;
-  const thumbY = trackHeight - thumbTotalH;
+  const thumbY = Math.round((trackHeight - thumbTotalH) / 2);
 
   const leftOuterX = 0;
   const leftInnerX = thumbW + gap;
@@ -390,27 +390,57 @@ export function DestinationsSection() {
       className="py-8 md:py-12 lg:py-14"
     >
       <Container>
-        {/* Desktop Horizontal Track: [thumb -2] [thumb -1] [FEATURED 0] [thumb +1] [thumb +2] */}
-        <div
-          ref={trackRef}
-          data-reveal
-          className="hidden lg:block relative w-full h-[500px] xl:h-[550px] overflow-hidden select-none"
-        >
-          {/* Top-Left Section Heading sitting above the 2 left thumbnails */}
-          <div className="absolute top-2 left-0 w-[22%] z-20 pointer-events-none pr-2">
+        {/* Section Header with Heading on Left and Slider Controls + View All on Top-Right */}
+        <div data-reveal className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
+          <div className="max-w-xl">
             <p className="text-[13px] font-medium text-ink-muted mb-1">
               Popular destinations
             </p>
             <h2
               id="destinations-heading"
-              className="text-[clamp(1.75rem,3vw,2.65rem)] font-medium tracking-[-0.03em] leading-[1.06] text-ink"
+              className="text-[clamp(1.75rem,3.2vw,2.75rem)] font-medium tracking-[-0.03em] leading-[1.06] text-ink"
             >
               Destinations You’ll Love
             </h2>
-            <p className="mt-2 text-sm text-ink-muted leading-snug">
+            <p className="mt-1.5 text-sm sm:text-base text-ink-muted leading-relaxed">
               Select any city below to preview stays, visa guidance, and seasonal fares.
             </p>
           </div>
+
+          {/* Top-Right Section Controls: Prev/Next arrows & View All Destinations */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => slideByOffset(-1)}
+              aria-label="Previous destination"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-ink hover:border-ink transition-colors cursor-pointer shadow-2xs"
+            >
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.8} />
+            </button>
+            <button
+              type="button"
+              onClick={() => slideByOffset(1)}
+              aria-label="Next destination"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink text-bg hover:opacity-90 transition-opacity cursor-pointer shadow-2xs"
+            >
+              <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
+            </button>
+            <Link
+              href="/hotels"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-xs sm:text-sm font-medium text-ink hover:border-ink transition-colors shadow-2xs"
+            >
+              <span>View all destinations</span>
+              <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.8} aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Desktop Horizontal Track: [thumb -2] [thumb -1] [FEATURED 0] [thumb +1] [thumb +2] */}
+        <div
+          ref={trackRef}
+          data-reveal
+          className="hidden lg:block relative w-full h-[470px] xl:h-[510px] overflow-hidden select-none"
+        >
 
           {/* Persistent Destination Cards on the Horizontal Track */}
           {destinations.map((dest, idx) => {
@@ -487,7 +517,7 @@ export function DestinationsSection() {
                       className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/40"
                     />
 
-                    {/* Top bar: functional tags left + prev/next arrows & "View all destinations" top-right */}
+                    {/* Top bar: functional tags left */}
                     <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 text-xs font-medium text-white">
@@ -496,35 +526,6 @@ export function DestinationsSection() {
                         <span className="rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 text-xs font-medium text-white">
                           {dest.visaQuickInfo}
                         </span>
-                      </div>
-
-                      <div
-                        className="flex items-center gap-1.5"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => slideByOffset(-1)}
-                          aria-label="Previous destination"
-                          className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/45 backdrop-blur-md border border-white/25 text-white hover:bg-black/65 transition-colors cursor-pointer"
-                        >
-                          <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => slideByOffset(1)}
-                          aria-label="Next destination"
-                          className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#0A0A0A] hover:opacity-90 transition-opacity cursor-pointer"
-                        >
-                          <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
-                        </button>
-                        <Link
-                          href="/hotels"
-                          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/25 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-black/65 transition-colors"
-                        >
-                          <span>View all destinations</span>
-                          <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
-                        </Link>
                       </div>
                     </div>
 
@@ -574,24 +575,7 @@ export function DestinationsSection() {
         </div>
 
         {/* Mobile / Tablet Scroll-Snap Slider */}
-        <div className="lg:hidden space-y-5">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-[13px] font-medium text-ink-muted mb-1">
-                Popular destinations
-              </p>
-              <h2 className="text-[clamp(1.75rem,3.2vw,2.75rem)] font-medium tracking-[-0.03em] leading-[1.06] text-ink">
-                Destinations You’ll Love
-              </h2>
-            </div>
-            <Link
-              href="/hotels"
-              className="inline-flex min-h-11 items-center text-xs font-medium text-ink underline underline-offset-4 shrink-0"
-            >
-              View all destinations
-            </Link>
-          </div>
-
+        <div className="lg:hidden">
           <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 no-scrollbar">
             {destinations.map((dest) => (
               <Link

@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, Clock, ShieldCheck } from "lucide-react";
+import { Check, Clock, ShieldCheck, User, Mail, Phone } from "lucide-react";
 import { sectionPhotography } from "@/data/stats";
 import { enquirySchema, type EnquiryInput } from "@/lib/validators";
 import { BLUR_DATA_URL, cn } from "@/lib/utils";
@@ -228,6 +228,7 @@ export function ContactSection() {
                     id="enquiry-name"
                     label="Full name"
                     placeholder="Alex Morgan"
+                    icon={<User className="h-4 w-4" strokeWidth={1.75} />}
                     error={errors.name?.message}
                     {...register("name")}
                   />
@@ -236,6 +237,7 @@ export function ContactSection() {
                     type="email"
                     label="Email address"
                     placeholder="alex@example.com"
+                    icon={<Mail className="h-4 w-4" strokeWidth={1.75} />}
                     error={errors.email?.message}
                     {...register("email")}
                   />
@@ -247,6 +249,7 @@ export function ContactSection() {
                     type="tel"
                     label="Phone number (optional)"
                     placeholder="+44 7700 900077"
+                    icon={<Phone className="h-4 w-4" strokeWidth={1.75} />}
                     error={errors.phone?.message}
                     {...register("phone")}
                   />

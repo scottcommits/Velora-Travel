@@ -103,35 +103,35 @@ export function WhyChooseUsSection() {
               </div>
             </div>
 
-            {/* Overlapping white image card with tight 7-8px inset and 6-8px thumbnail-to-text gap */}
+            {/* Overlapping white image card - generously sized */}
             <Link
               href="/hotels"
               data-reveal
-              className="group relative sm:absolute -mt-14 sm:mt-0 ml-auto sm:right-0 sm:top-1/2 sm:-translate-y-1/2 z-[5] block w-[78%] sm:w-[236px] rounded-[18px] border border-line bg-surface p-[7px] sm:p-2 transition-transform duration-300 hover:-translate-y-[calc(50%+3px)]"
+              className="group relative sm:absolute -mt-16 sm:mt-0 ml-auto sm:-right-4 lg:-right-6 sm:top-1/2 sm:-translate-y-1/2 z-[5] block w-[85%] sm:w-[290px] md:w-[315px] rounded-[22px] border border-line bg-surface p-2.5 sm:p-3 shadow-[0_18px_44px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:-translate-y-[calc(50%+4px)]"
             >
-              <div className="relative aspect-[4/3] w-full rounded-[12px] overflow-hidden bg-surface-2">
+              <div className="relative aspect-[16/11] w-full rounded-[16px] overflow-hidden bg-surface-2">
                 <Image
                   src={sectionPhotography.aboutOverlap}
                   alt="Green island cove surrounded by calm clear water"
                   fill
                   placeholder="blur"
                   blurDataURL={BLUR_DATA_URL}
-                  sizes="236px"
+                  sizes="(min-width: 640px) 315px, 85vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <span
                   aria-hidden="true"
-                  className="absolute top-2 right-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-surface text-ink"
+                  className="absolute top-2.5 right-2.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-surface/90 backdrop-blur-md text-ink shadow-xs"
                 >
-                  <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  <ArrowUpRight className="h-4 w-4" strokeWidth={1.8} />
                 </span>
               </div>
-              <div className="mt-[7px] px-1 pb-0.5">
-                <h3 className="text-[13.5px] font-medium leading-tight text-ink">
+              <div className="mt-2.5 px-1 pb-0.5 space-y-1">
+                <h3 className="text-sm sm:text-[15.5px] font-semibold leading-tight text-ink">
                   Tailored Itineraries
                 </h3>
-                <p className="mt-0.5 text-[11.5px] text-ink-muted leading-snug">
-                  Visas, flights, stays, and local cars coordinated in one schedule.
+                <p className="text-xs sm:text-[13px] text-ink-muted leading-relaxed">
+                  Visas, flights, boutique stays, and private cars seamlessly coordinated in one itinerary.
                 </p>
               </div>
             </Link>

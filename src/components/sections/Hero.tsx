@@ -152,13 +152,13 @@ export function Hero() {
     <section
       ref={root}
       aria-labelledby="hero-headline"
-      className="pt-1 pb-4 md:pb-6"
+      className="pt-0 pb-4 md:pb-6"
     >
       <Container>
         {/* Full-width rounded hero photo with headline, CTAs, and SearchTabs ALL inside */}
         <div
           data-hero-card
-          className="relative w-full rounded-[24px] lg:h-[calc(100svh-var(--navbar-h)-var(--gutter))] lg:min-h-[620px] lg:max-h-[960px] flex flex-col justify-end p-3.5 sm:p-5 md:p-6"
+          className="relative w-full rounded-[24px] lg:h-[calc(100svh-var(--gutter))] lg:min-h-[640px] lg:max-h-[980px] flex flex-col justify-end p-3.5 sm:p-5 md:p-6 pt-20 sm:pt-24 lg:pt-20"
         >
           {/* Background Image Layer (z-0, registered for DOM-synced WebGL plane at z-[2]) */}
           <div

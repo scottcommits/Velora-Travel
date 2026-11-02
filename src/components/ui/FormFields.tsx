@@ -21,12 +21,13 @@ import { cn, formatUsd } from "@/lib/utils";
    ========================================================================== */
 
 const fieldCellBase =
-  "group relative flex flex-col justify-center rounded-[16px] border border-line bg-bg/60 px-4 py-2.5 transition-colors hover:border-ink/30 focus-within:border-ink focus-within:bg-surface";
+  "group relative flex flex-col justify-center rounded-[16px] border border-line bg-bg/40 px-4 py-2.5 transition-all duration-200 hover:border-ink/40 hover:bg-surface focus-within:border-ink focus-within:bg-surface focus-within:ring-2 focus-within:ring-ink/10";
 
 export interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
   hint?: string;
+  icon?: ReactNode;
 }
 
 export function InputField({
@@ -34,6 +35,7 @@ export function InputField({
   id,
   error,
   hint,
+  icon,
   type,
   className,
   ...props
@@ -49,7 +51,7 @@ export function InputField({
         className={cn(
           fieldCellBase,
           "min-h-[58px]",
-          error && "border-error focus-within:border-error"
+          error && "border-error focus-within:border-error focus-within:ring-error/15"
         )}
       >
         <label
@@ -66,12 +68,17 @@ export function InputField({
             aria-describedby={describedBy}
             className={cn(
               "w-full bg-transparent text-[15px] font-medium text-ink placeholder:text-ink-muted/50 leading-snug focus:outline-none",
-              isDate && "velora-date pr-6 cursor-pointer",
+              (icon || isDate) && "pr-6",
+              isDate && "velora-date cursor-pointer",
               className
             )}
             {...props}
           />
-          {isDate ? (
+          {icon ? (
+            <div className="pointer-events-none absolute right-0 text-ink-muted/60 transition-colors group-hover:text-ink group-focus-within:text-ink">
+              {icon}
+            </div>
+          ) : isDate ? (
             <Calendar
               aria-hidden="true"
               strokeWidth={1.6}

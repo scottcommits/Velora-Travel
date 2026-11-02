@@ -65,7 +65,7 @@ export function Navbar() {
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-50 w-full bg-transparent border-none pointer-events-none"
+      className="fixed top-0 inset-x-0 z-50 w-full bg-transparent border-none pointer-events-none"
     >
       <Container>
         <nav
