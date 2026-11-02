@@ -123,7 +123,9 @@ export function Navbar() {
 
           {/* Right Actions: Desktop has ThemeToggle + Plan a trip; Mobile has Plan a trip + Menu */}
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <ThemeToggle scrolled={scrolled} className="hidden lg:inline-flex" />
+            <div className="hidden lg:flex items-center">
+              <ThemeToggle scrolled={scrolled} />
+            </div>
             <ButtonLink
               href="/#contact"
               variant="primary"

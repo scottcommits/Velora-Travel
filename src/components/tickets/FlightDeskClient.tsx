@@ -240,7 +240,7 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
   return (
     <div className="space-y-6">
       {/* Expansive Panoramic Horizon Hero Stage (Full-span, spacious, non-boxed) */}
-      <div className="relative min-h-[480px] rounded-[28px] border border-line bg-ink text-white p-6 sm:p-8 lg:p-10 flex flex-col justify-between gap-8">
+      <div className="relative min-h-[480px] rounded-[28px] border border-line bg-ink text-white p-4 sm:p-8 lg:p-10 flex flex-col justify-between gap-8">
         {/* Clipped background photo container */}
         <div className="absolute inset-0 z-0 rounded-[28px] overflow-hidden pointer-events-none">
           <Image
@@ -263,7 +263,7 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
           <nav
             aria-label="Switch travel service desk"
-            className="inline-flex items-center gap-0.5 sm:gap-1 rounded-full bg-black/50 backdrop-blur-md border border-white/20 p-1 max-w-full overflow-x-auto no-scrollbar"
+            className="inline-flex items-center gap-0.5 sm:gap-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 p-1 max-w-full overflow-x-auto no-scrollbar shrink-0 shadow-sm"
           >
             {SERVICE_TABS.map((tab) => {
               const Icon = tab.icon;
@@ -274,12 +274,19 @@ export function FlightDeskClient({ initialFlights }: { initialFlights: Flight[] 
                   aria-current={tab.active ? "page" : undefined}
                   className={
                     tab.active
-                      ? "inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-medium text-ink shadow-xs shrink-0 whitespace-nowrap"
+                      ? "inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-semibold text-ink shadow-xs shrink-0 whitespace-nowrap"
                       : "inline-flex items-center gap-1.5 rounded-full px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-medium text-white/85 hover:text-white transition-colors shrink-0 whitespace-nowrap"
                   }
                 >
-                  <Icon className="h-3.5 w-3.5" strokeWidth={1.7} aria-hidden="true" />
-                  {tab.label}
+                  <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.7} aria-hidden="true" />
+                  {tab.label === "Car Rental" ? (
+                    <>
+                      <span className="sm:hidden">Cars</span>
+                      <span className="hidden sm:inline">Car Rental</span>
+                    </>
+                  ) : (
+                    <span>{tab.label}</span>
+                  )}
                 </Link>
               );
             })}
